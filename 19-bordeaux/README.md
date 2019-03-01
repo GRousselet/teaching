@@ -1,1 +1,37 @@
+# Statistiques : méthodes robustes et méthodes conventionnelles. Introduction à l’estimation robuste avec le logiciel R
 
+Description on [urfist website](https://sygefor.reseau-urfist.fr/#/training/7680/8489/b22511377f9a12f2c227ef2628933a3d).
+
+This workshop provides an introduction to statistical assessment of data using robust estimators, techniques to build confidence intervals such as the percentile bootstrap, and detailed graphical representations. The philosophy underpinning the workshop is described in these articles:
+
+Rousselet, Guillaume A., John J. Foxe, and J. Paul Bolam. 2016. ‘A Few Simple Steps to Improve the Description of Group Results in Neuroscience’. European Journal of Neuroscience 44 (9): 2647–51. [pdf](https://doi.org/10.1111/ejn.13400) [preprint]() [reproducibility package]() .
+
+Rousselet, Guillaume A., Cyril R. Pernet, and Rand R. Wilcox. 2017. ‘Beyond Differences in Means: Robust Graphical Methods to Compare Two Groups in Neuroscience’. [pdf]() [preprint](https://doi.org/10.1101/121079) [reproducibility package]().
+
+The main topics include:
+
+- robust measures of central tendency & dispersion;
+- robust correlation approaches, including how to compare correlation coefficients;
+- bootstrap techniques to build confidence intervals;
+- detailed assessment of distributions using quantile estimation;
+- detailed graphical representations using the R packages `ggplot2` and `rogme`;
+- simulations to assess power and measurement precision;
+- how to go beyond p < 0.05 and make the most of your data.
+
+The slides in pdf format are [here]().
+
+## Part 1: Introduction [code]()
+
+## Part 2: [code]()
+code
+
+## Part 3: [code]()
+code
+
+## Part 4: [code]()
+code
+
+## Part 5: [code]()
+code
+
+## Part 6: [code]()
