@@ -1,0 +1,26 @@
+---
+title: "Bordeaux 2019 - robust stats - part 1: introduction"
+author: "Guillaume A. Rousselet"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: no
+    number_sections: no
+    toc: yes
+    toc_depth: 2
+---
+
+```{r message=FALSE, warning=FALSE}
+# dependencies
+# library(ggplot2)
+# library(tibble)
+# library(tidyr)
+# library(cowplot)
+# library(retimes)
+# source("./functions/tests.txt")
+# library(beepr)
+```
+
+```{r}
+sessionInfo()
+```

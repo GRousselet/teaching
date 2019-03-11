@@ -1,0 +1,154 @@
+---
+title: "Bordeaux 2019 - robust stats - part 1: make data set"
+author: "Guillaume A. Rousselet"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: no
+    number_sections: no
+    toc: yes
+    toc_depth: 2
+---
+
+```{r message=FALSE, warning=FALSE}
+# dependencies
+library(ggplot2)
+library(tibble)
+# library(tidyr)
+# library(cowplot)
+# library(retimes)
+# source("./functions/tests.txt")
+# library(beepr)
+```
+
+```{r}
+sessionInfo()
+```
+
+Determine population parameters
+```{r}
+# dice / type of participants available
+dice <- c(4, 6, 8, 10, 12, 20)
+# weights / proportions of each type for population 1
+pop1 <- c(0, 5, 6, 3, 1, 0)
+pop2 <- c(2, 4, 3, 4, 2, 0)
+pop3 <- c(0, 3, 4, 4, 2, 2)
+```
+
+Check weights add up to the same
+```{r}
+sum(pop1)
+sum(pop2)
+sum(pop3)
+```
+
+Dice to get
+```{r}
+bn <- 5 # multiply by n to make bag populations
+# red
+pop1 * bn
+# green
+pop2 * bn
+# blue
+pop3 * bn
+```
+
+Test hierarchical sampling: 1 experiment
+```{r}
+set.seed(777)
+np <- 10
+nt <- 5
+# sample participants
+samp1 <- sample(dice, np, replace = TRUE, prob = pop1)
+samp2 <- sample(dice, np, replace = TRUE, prob = pop2)
+samp3 <- sample(dice, np, replace = TRUE, prob = pop3)
+# sample trials for each participant
+res1 <- matrix(NA, nrow = nt, ncol = np)
+res2 <- matrix(NA, nrow = nt, ncol = np)
+res3 <- matrix(NA, nrow = nt, ncol = np)
+for(P in 1:np){
+  res1[,P] <- runif(nt, min = 0, max = samp1[P])
+  res2[,P] <- runif(nt, min = 0, max = samp2[P])
+  res3[,P] <- runif(nt, min = 0, max = samp3[P])
+}
+```
+
+Mean results
+```{r}
+round(apply(res1, 2, mean), digits=1)
+round(apply(res2, 2, mean), digits=1)
+round(apply(res3, 2, mean), digits=1)
+```
+
+Illustrate results: all trials
+```{r}
+set.seed(1)
+df <- tibble(obs = c(as.vector(res1),as.vector(res2),as.vector(res3)),
+             gp = factor(c(rep(1,np*nt),rep(2,np*nt),rep(3,np*nt))),
+             id = factor(rep(1:(np*3),each=nt))
+             )
+
+  ggplot(df, aes(gp, obs)) + theme_linedraw() +
+  geom_point(aes(colour = gp), position = position_jitter(width = 0.1)) +
+  theme(legend.position = "none",
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16)) +
+  geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
+                fun.ymax = mean, colour = "grey", width = .55, size = 3) +
+  geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
+                fun.ymax = mean, colour = "black", width = .5, size = 1)
+  #   geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median, 
+  #               fun.ymax = median, colour = "grey40", width = .55, size = 3) +
+  # geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median, 
+  #               fun.ymax = median, colour = "orange", width = .5, size = 1)
+```
+
+Full simulation
+```{r}
+nsim <- 10000
+set.seed(666)
+np <- 10
+nt <- 5
+
+sim.res <- matrix(NA, nrow = nsim, ncol = 3) # 3 groups
+ 
+# sample participants once
+samp1 <- matrix(sample(dice, np*nsim, replace = TRUE, prob = pop1), nrow = nsim)
+samp2 <- matrix(sample(dice, np*nsim, replace = TRUE, prob = pop2), nrow = nsim)
+samp3 <- matrix(sample(dice, np*nsim, replace = TRUE, prob = pop3), nrow = nsim)
+
+# trial matrices
+res1 <- matrix(NA, nrow = nt, ncol = np)
+res2 <- matrix(NA, nrow = nt, ncol = np)
+res3 <- matrix(NA, nrow = nt, ncol = np)
+
+for(sim in 1:nsim){
+  
+  # sample trials for each participant
+  for(P in 1:np){
+    res1[,P] <- runif(nt, min = 0, max = samp1[sim,P])
+    res2[,P] <- runif(nt, min = 0, max = samp2[sim,P])
+    res3[,P] <- runif(nt, min = 0, max = samp3[sim,P])
+  }
+  
+  sim.res[sim,1] <- mean(res1)
+  sim.res[sim,2] <- mean(res2)
+  sim.res[sim,3] <- mean(res3)
+  
+}
+```
+
+Illustrate sampling distributions
+```{r}
+df <- tibble(obs = as.vector(sim.res),
+             sim = factor(rep(1:nsim,3)),
+             gp = factor(rep(1:3,each=nsim))
+             )
+
+  ggplot(df, aes(obs, fill = gp, colour = gp)) + theme_linedraw() +
+  geom_density(alpha = 0.5) +
+  theme(legend.position = "none",
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16))
+```
+
