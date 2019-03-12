@@ -25,11 +25,11 @@ library(tibble)
 sessionInfo()
 ```
 
-Determine population parameters
+Set population parameters
 ```{r}
-# dice / type of participants available
+# dice / types of participants available
 dice <- c(4, 6, 8, 10, 12, 20)
-# weights / proportions of each type for population 1
+# weights / proportions of each type for the 3 populations
 pop1 <- c(0, 5, 6, 3, 1, 0)
 pop2 <- c(2, 4, 3, 4, 2, 0)
 pop3 <- c(0, 3, 4, 4, 2, 2)
@@ -67,9 +67,9 @@ res1 <- matrix(NA, nrow = nt, ncol = np)
 res2 <- matrix(NA, nrow = nt, ncol = np)
 res3 <- matrix(NA, nrow = nt, ncol = np)
 for(P in 1:np){
-  res1[,P] <- runif(nt, min = 0, max = samp1[P])
-  res2[,P] <- runif(nt, min = 0, max = samp2[P])
-  res3[,P] <- runif(nt, min = 0, max = samp3[P])
+  res1[,P] <- sample(1:samp1[P], nt, replace = TRUE)
+  res2[,P] <- sample(1:samp2[P], nt, replace = TRUE)
+  res3[,P] <- sample(1:samp3[P], nt, replace = TRUE)
 }
 ```
 
@@ -126,9 +126,9 @@ for(sim in 1:nsim){
   
   # sample trials for each participant
   for(P in 1:np){
-    res1[,P] <- runif(nt, min = 0, max = samp1[sim,P])
-    res2[,P] <- runif(nt, min = 0, max = samp2[sim,P])
-    res3[,P] <- runif(nt, min = 0, max = samp3[sim,P])
+    res1[,P] <- sample(1:samp1[sim,P], nt, replace = TRUE)
+    res2[,P] <- sample(1:samp2[sim,P], nt, replace = TRUE)
+    res3[,P] <- sample(1:samp3[sim,P], nt, replace = TRUE)
   }
   
   sim.res[sim,1] <- mean(res1)
