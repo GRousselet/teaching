@@ -1,0 +1,50 @@
+---
+title: "Bordeaux 2019 - robust stats - part 4: percentile bootstrap"
+author: "Guillaume A. Rousselet"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: no
+    number_sections: no
+    toc: yes
+    toc_depth: 2
+---
+
+```{r message=FALSE, warning=FALSE}
+# dependencies
+library(ggplot2)
+library(tibble)
+```
+
+```{r}
+sessionInfo()
+```
+
+# Bootstrap implementation
+
+## Loop
+```{r}
+
+```
+
+## Matrix
+```{r}
+
+```
+
+# Bootstrap sampling distribution
+
+https://stackoverflow.com/questions/51043753/overlay-histogram-with-empirical-density-and-dnorm-function
+
+```{r}
+
+```
+
+# Confidence interval variability
+
+https://stackoverflow.com/questions/12253239/vertical-lines-between-points-with-ggplot2
+
+```{r}
+
+```
+

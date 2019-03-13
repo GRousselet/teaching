@@ -20,18 +20,26 @@ The main topics include:
 
 The slides in pdf format are [here]().
 
-## Part 1: Introduction [code]()
+## Part 1: Introduction 
+[code]()
+[notebook]()
 
-## Part 2: [code]()
-code
+## Part 2: 
+[code]()
+[notebook]()
 
-## Part 3: [code]()
-code
+## Part 3: 
+[code]()
+[notebook]()
 
-## Part 4: [code]()
-code
+## Part 4: 
+[code]()
+[notebook]()
 
-## Part 5: [code]()
-code
+## Part 5: 
+[code]()
+[notebook]()
 
-## Part 6: [code]()
+## Part 6: 
+[code]()
+[notebook]()

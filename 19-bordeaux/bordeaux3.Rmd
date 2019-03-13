@@ -1,0 +1,53 @@
+---
+title: "Bordeaux 2019 - robust stats - part 3: sampling distributions"
+author: "Guillaume A. Rousselet"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: no
+    number_sections: no
+    toc: yes
+    toc_depth: 2
+---
+
+```{r message=FALSE, warning=FALSE}
+# dependencies
+library(ggplot2)
+library(tibble)
+```
+
+```{r}
+sessionInfo()
+```
+
+# Reaction time example
+```{r}
+
+```
+
+# Correlation example
+```{r}
+
+```
+
+# Example using the mean
+```{r}
+
+```
+
+# Example using the lognormal
+
+[Blog post](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/) on how to use `rlnorm()`.
+
+```{r}
+m <- 7
+s <- 75
+location <- log(m^2 / sqrt(s^2 + m^2))
+shape <- sqrt(log(1 + (s^2 / m^2)))
+print(paste("location:", location))
+print(paste("shape:", shape))
+draws3 <- rlnorm(n=1000000, location, shape)
+
+```
+
+

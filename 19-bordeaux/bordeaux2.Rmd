@@ -1,0 +1,27 @@
+---
+title: "Bordeaux 2019 - robust stats - part 2: robust estimation"
+author: "Guillaume A. Rousselet"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: no
+    number_sections: no
+    toc: yes
+    toc_depth: 2
+---
+
+```{r message=FALSE, warning=FALSE}
+# dependencies
+library(ggplot2)
+library(tibble)
+```
+
+```{r}
+sessionInfo()
+```
+
+Reference on slide 1: "We caution against the fallacy of assuming that that which does not kill statistical significance makes it stronger" (Loken & Gelman, 2017, Science)
+
+"The strategy of run-a-crappy-study, get p less than .05, come up with a cute story based on evolutionary psychology, and PROFIT . . . well, it does not work anymore. OK, maybe it still can work if your goal is to get published in PPNAS, get tenure, give Ted talks, and make boatloads of money in speaking fees. But it will not work in the real sense, the important sense of learning about the world." 
+
+"Trying to use a survey of 3,000 people to estimate tiny differences in sex ratios: this makes about as much sense as using a bathroom scale to weigh a feather, when that feather is resting loosely in the pouch of a kangaroo that is vigorously jumping up and down." (Gelman, 2018, *Personality and Social Psychology Bulletin*)

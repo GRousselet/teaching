@@ -12,15 +12,101 @@ output:
 
 ```{r message=FALSE, warning=FALSE}
 # dependencies
-# library(ggplot2)
-# library(tibble)
-# library(tidyr)
-# library(cowplot)
-# library(retimes)
-# source("./functions/tests.txt")
-# library(beepr)
+library(ggplot2)
+library(tibble)
 ```
 
 ```{r}
 sessionInfo()
 ```
+
+References
+
+# Exercise
+
+## Data collection
+
+Description
+
+Data capture
+```{r}
+# enter data in matrix with 5 rows, 10 columns:
+
+# dice_res[,1] <- c(,,,,)
+# dice_res[,2] <- c(,,,,)
+# dice_res[,3] <- c(,,,,)
+# dice_res[,4] <- c(,,,,)
+# dice_res[,5] <- c(,,,,)
+# dice_res[,6] <- c(,,,,)
+# dice_res[,7] <- c(,,,,)
+# dice_res[,8] <- c(,,,,)
+# dice_res[,9] <- c(,,,,)
+# dice_res[,10] <- c(,,,,)
+
+# Save in a txt file, for instance for population 1:
+
+# write.table(dice_res, file = "./data/dice_res_blue.txt", row.names=FALSE, col.names=FALSE)
+# write.table(dice_res, file = "./data/dice_res_green.txt", row.names=FALSE, col.names=FALSE)
+# write.table(dice_res, file = "./data/dice_res_red.txt", row.names=FALSE, col.names=FALSE)
+
+# email me the data: Guillaume.Rousselet@glasgow.ac.uk
+```
+
+## Load simulated data
+
+```{r}
+res_red <- matrix(scan("./data/res1.txt"), nrow=nt, byrow=TRUE)
+res_green <- matrix(scan("./data/res2.txt"), nrow=nt, byrow=TRUE)
+res_blue <- matrix(scan("./data/res3.txt"), nrow=nt, byrow=TRUE)
+```
+
+## Load data
+
+```{r}
+res_red <- matrix(scan("./data/dice_res_red.txt"), nrow=nt, byrow=TRUE)
+res_green <- matrix(scan("./data/dice_res_green.txt"), nrow=nt, byrow=TRUE)
+res_blue <- matrix(scan("./data/dice_res_blue.txt"), nrow=nt, byrow=TRUE)
+```
+
+## Illustration
+
+Mean results
+```{r}
+m.red <- round(apply(res_red, 2, mean), digits=1)
+m.green <- round(apply(res_green, 2, mean), digits=1)
+m.blue <- round(apply(res_blue, 2, mean), digits=1)
+```
+
+Illustrate results
+```{r}
+set.seed(1)
+df <- tibble(obs = c(m.red, m.green, m.blue),
+             gp = factor(c(rep("Red",np),rep("Green",np),rep("Blue",np)))
+             )
+
+# preserve factor order
+df$gp <- as.character(df$gp)
+df$gp <- factor(df$gp, levels=unique(df$gp))
+
+  ggplot(df, aes(gp, obs)) + theme_linedraw() +
+  geom_point(aes(colour = gp), position = position_jitter(width = 0.1)) +
+    scale_color_manual(values=c("red", "green4", "blue")) +
+  theme(legend.position = "none",
+        axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16)) +
+  labs(x = "Groups", y = "Observations") +   
+    coord_cartesian(ylim = c(0, 12)) +
+    scale_y_continuous(breaks = seq(0, 12, 2)) +
+  geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
+                fun.ymax = mean, colour = "grey", width = .55, size = 3) +
+  geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
+                fun.ymax = mean, colour = "black", width = .5, size = 1)
+  #   geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median, 
+  #               fun.ymax = median, colour = "grey40", width = .55, size = 3) +
+  # geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median, 
+  #               fun.ymax = median, colour = "orange", width = .5, size = 1)
+```
+
+## Inferential statistics?
+
+What would you do next with the data?
