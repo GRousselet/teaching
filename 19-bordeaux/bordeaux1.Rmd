@@ -20,15 +20,23 @@ library(tibble)
 sessionInfo()
 ```
 
-References
+# References
+
+
 
 # Exercise
 
-## Data collection
+## Description
 
-Description
+- Form 3 groups.
+- Each group gets a bag (a population).
+- Pick 10 dice/participants from the bag (sample participants without replacement).
+- Get 5 trials per participant (throw each dice 5 times).
 
-Data capture
+## Data capture
+
+Enter the data in R or a text file: 5 rows (trials) and 10 columns (participants).
+
 ```{r}
 # enter data in matrix with 5 rows, 10 columns:
 
@@ -101,10 +109,6 @@ df$gp <- factor(df$gp, levels=unique(df$gp))
                 fun.ymax = mean, colour = "grey", width = .55, size = 3) +
   geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
                 fun.ymax = mean, colour = "black", width = .5, size = 1)
-  #   geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median, 
-  #               fun.ymax = median, colour = "grey40", width = .55, size = 3) +
-  # geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median, 
-  #               fun.ymax = median, colour = "orange", width = .5, size = 1)
 ```
 
 ## Inferential statistics?

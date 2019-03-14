@@ -22,29 +22,327 @@ sessionInfo()
 
 # Bootstrap implementation
 
+## Sampling with replacement
+
+Test the `sample()` function.
+Execute chunk several times to see what happens.
+```{r}
+n <- 10 # sample size
+samp <- 1:n
+boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
+boot.samp
+```
+
 ## Loop
 ```{r}
+set.seed(21) # reproducible results
+n <- 20 # sample size
+samp <- rnorm(n) # get normal sample
+nboot <- 1000 # number of bootstrap samples
+# declare vector of results
+boot.m <- vector(mode = "numeric", length = nboot) # save means
+boot.md <- vector(mode = "numeric", length = nboot) # save medians
+for(B in 1:nboot){
+  boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
+  boot.m[B] <- mean(boot.samp)
+  boot.md[B] <- median(boot.samp)
+}
+samp.m <- mean(samp)
+samp.md <- median(samp)
+samp.m
+samp.md
+```
 
+### Plot original results
+```{r, fig.width=2}
+set.seed(1)
+df <- tibble(cond = factor(rep(1,n)),
+             res = samp) 
+ggplot(df, aes(x = cond, y = res)) + theme_linedraw() + 
+  geom_jitter(width = 0.1, alpha = 0.3) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks = element_blank()) +
+  scale_x_discrete(name ="") +
+  # stat_summary(fun.y=median, geom="line")
+  geom_segment(aes(x = 0.9, y = samp.m, xend = 1.1, yend = samp.m)) +
+  geom_segment(aes(x = 0.9, y = samp.md, xend = 1.1, yend = samp.md), colour = "orange") +
+  annotate("text", x = 1.2, y = samp.m, label = "Mean", size = 3) +
+  annotate("text", x = 1.2, y = samp.md, label = "Median", size = 3, colour = "orange")
+```
+
+
+### Plot bootstrap results
+```{r}
+df <- tibble(res = c(boot.m, boot.md),
+             est = factor(c(rep("Mean",nboot), rep("Median",nboot)))
+             )
+ggplot(df, aes(x = res, colour = est)) +
+  geom_density(size = 1) +
+  ggtitle("Boostrap samples")
 ```
 
 ## Matrix
 ```{r}
+set.seed(21) # reproducible results
+n <- 20 # sample size
+samp <- rnorm(n) # get normal sample
+nboot <- 1000 # number of bootstrap samples
+# sample with replacement + reoganise in matrix
+boot.samp <- matrix(sample(samp, n*nboot, replace = TRUE), nrow = nboot)
+boot.m <- apply(boot.samp, 1, mean)
+boot.md <- apply(boot.samp, 1, median)
+```
 
+## Functions
+
+[*boot* package](https://www.statmethods.net/advstats/bootstrapping.html)
+
+Functions from Rand Wilcox
+```{r}
+# source('./code/Rallfun-v35.txt')
+#
+#
 ```
 
 # Bootstrap sampling distribution
 
-https://stackoverflow.com/questions/51043753/overlay-histogram-with-empirical-density-and-dnorm-function
+## Example 1: sample from normal distribution
 
 ```{r}
+set.seed(777) 
+n <- 100
+samp <- rnorm(n)
+nboot <- 1000
+nsamp <- 10000
+# bootstrap distribution
+boot.samp <- apply(matrix(sample(samp, n*nboot, replace = TRUE), nrow = nboot), 1, mean)
+# sampling distribution of the mean
+dist.samp <- apply(matrix(rnorm(n*nsamp), nrow = nsamp), 1, mean)
+v <- as_tibble(dist.samp) 
+ggplot(v, aes(x = value)) +
+        geom_histogram(aes(y = ..density..), 
+                       bins = 40,  colour = "black", fill = "white") +
+        geom_line(aes(y = ..density.., colour = 'Sampling'), stat = 'density', size = 1) +     
+        # stat_function(fun = dnorm, aes(colour = 'Normal'),
+        #                  args = list(mean = mean(boot.samp), sd = sd(boot.samp)), size = 1) +
+        geom_line(data = as_tibble(boot.samp),  
+                  aes(x = value, y = ..density.., colour = 'Bootstrap'), 
+                  stat = 'density', size = 1) +
+        scale_colour_manual(name = "Distributions", values = c("green4", "orange1")) +
+  theme(legend.position = c(0.1, 0.85),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        legend.text = element_text(size = 12),
+      legend.title = element_text(size = 14)
+       )
+```
 
+## Example 2: sample from gamma distribution
+
+Check shape of gamme distribution
+```{r}
+x <- seq(0, 15, .05)
+ggplot(as_tibble(x), aes(value)) +
+  stat_function(fun = dgamma, args = list(shape = 2, scale = 2))
+```
+
+
+```{r}
+set.seed(777) 
+n <- 100
+gamma_shape <- 2
+gamma_scale <- 2
+# sample n trials from gamma distribution
+samp <- rgamma(n, shape = gamma_shape, scale = gamma_scale)
+nboot <- 1000
+nsamp <- 10000
+# bootstrap distribution
+boot.samp <- apply(matrix(sample(samp, n*nboot, replace = TRUE), nrow = nboot), 1, mean)
+# sampling distribution of the mean of n trials from gamma distribution
+dist.samp <- apply(matrix(rgamma(n*nsamp, shape = gamma_shape, scale = gamma_scale), nrow = nsamp), 1, mean)
+v <- as_tibble(dist.samp) 
+ggplot(v, aes(x = value)) +
+        geom_histogram(aes(y = ..density..), 
+                       bins = 40,  colour = "black", fill = "white") +
+        geom_line(aes(y = ..density.., colour = 'Sampling'), stat = 'density', size = 1) +     
+        # stat_function(fun = dnorm, aes(colour = 'Normal'),
+        #                  args = list(mean = mean(boot.samp), sd = sd(boot.samp)), size = 1) +
+        geom_line(data = as_tibble(boot.samp),  
+                  aes(x = value, y = ..density.., colour = 'Bootstrap'), 
+                  stat = 'density', size = 1) +
+        scale_colour_manual(name = "Distributions", values = c("green4", "orange1")) +
+  theme(legend.position = c(0.1, 0.85),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        legend.text = element_text(size = 12),
+      legend.title = element_text(size = 14)
+       )
+```
+
+# Bootstrap confidence interval
+```{r}
+nboot <- 1000
+alpha <- .1
+lo <- nboot*(alpha/2)
+hi <- nboot - lo
+lo <- lo + 1
+
+set.seed(777) 
+n <- 100
+samp <- rnorm(n, m = 50, sd = 20)
+# bootstrap distribution
+boot.samp <- apply(matrix(sample(samp, n*nboot, replace = TRUE), nrow = nboot), 1, mean)
+# confidence interval
+sort.boot.samp <- sort(boot.samp) # sort bootstrap estimates
+ci <- vector(mode = "numeric", length = 2)
+ci[1] <- sort.boot.samp[lo]
+ci[2] <- sort.boot.samp[hi]
+```
+
+## Check standard confidence interval
+How do they compare?
+```{r}
+t.test(samp, conf.level = 1-alpha)
 ```
 
 # Confidence interval variability
 
+We perform many experiments, and for each experiment we compute a confidence interval, which we plot as horizontal lines.
+
 https://stackoverflow.com/questions/12253239/vertical-lines-between-points-with-ggplot2
 
+## Sample from a normal distribution
+```{r}
+nboot <- 1000
+alpha <- .1
+lo <- nboot*(alpha/2)
+hi <- nboot - lo
+lo <- lo + 1
+
+nexp <- 50 # number of experiments
+n <- 20 # sample size in each experiment
+n.m <- 50 # mean of normal distribution 
+n.sd <- 20 # sd of normal distribution
+ci <- matrix(NA, nrow = nexp, ncol = 2)
+for(E in 1:nexp){
+  # sample data + bootstrap + compute mean of each bootstrap sample in one line of code
+  boot.samp <- apply(matrix(sample(rnorm(n, n.m, n.sd), n*nboot, replace = TRUE), nrow = nboot), 1, mean)
+  sort.boot.samp <- sort(boot.samp) # sort bootstrap estimates
+  ci[E,1] <- sort.boot.samp[lo] 
+  ci[E,2] <- sort.boot.samp[hi]
+}
+```
+
+### Illustrate results
+```{r, fig.height=3, fig.width=2}
+df <- tibble(x = as.vector(ci),
+             y = rep(1:nexp,2),
+             gr = factor(rep(1:nexp,2))
+            )
+ggplot(df, aes(x = x, y = y)) + theme_linedraw() +
+  geom_point() +
+  geom_line(aes(group = gr)) +
+  geom_vline(xintercept = n.m, colour = "red") +
+  labs(x = "Values", y = "Experiments") +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14))
+```
+
+### Width variability
+
+Let's get more data
+```{r}
+set.seed(21)
+
+nboot <- 200
+alpha <- .1
+lo <- nboot*(alpha/2)
+hi <- nboot - lo
+lo <- lo + 1
+
+nexp <- 1000 # number of experiments
+n <- 20 # sample size in each experiment
+n.m <- 50 # mean of normal distribution 
+n.sd <- 20 # sd of normal distribution
+ci <- matrix(NA, nrow = nexp, ncol = 2)
+for(E in 1:nexp){
+  # sample data + bootstrap + compute mean of each bootstrap sample in one line of code
+  boot.samp <- apply(matrix(sample(rnorm(n, n.m, n.sd), n*nboot, replace = TRUE), nrow = nboot), 1, mean)
+  sort.boot.samp <- sort(boot.samp) # sort bootstrap estimates
+  ci[E,1] <- sort.boot.samp[lo] 
+  ci[E,2] <- sort.boot.samp[hi]
+}
+
+# Illustrate distribution of the width of the confidence intervals
+ggplot(as_tibble(ci[,2]-ci[,1]), aes(x = value)) +
+  geom_density() +
+  theme(
+    axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14)
+  ) +
+  coord_cartesian(xlim = c(0, 25))
+```
+
+What happens if you increase the sample size?
+What happens if you decrease the number of boostrap samples? For instance, try nboot = 50.
+
+### Coverage
+How often does the confidence interval contain the population value?
+```{r}
+set.seed(21)
+
+nboot <- 200
+alpha <- .1
+lo <- nboot*(alpha/2)
+hi <- nboot - lo
+lo <- lo + 1
+
+nexp <- 1000 # number of experiments
+n <- 20 # sample size in each experiment
+n.m <- 50 # mean of normal distribution 
+n.sd <- 20 # sd of normal distribution
+ci <- matrix(NA, nrow = nexp, ncol = 2)
+for(E in 1:nexp){
+  # sample data + bootstrap + compute mean of each bootstrap sample in one line of code
+  boot.samp <- apply(matrix(sample(rnorm(n, n.m, n.sd), n*nboot, replace = TRUE), nrow = nboot), 1, mean)
+  sort.boot.samp <- sort(boot.samp) # sort bootstrap estimates
+  ci[E,1] <- sort.boot.samp[lo] 
+  ci[E,2] <- sort.boot.samp[hi]
+}
+
+mean(n.m > ci[,1] & n.m < ci[,2])
+```
+
+### Coverage of standard confidence interval
+How often does the confidence interval contain the population value?
+```{r}
+set.seed(21)
+
+alpha <- .1
+
+nexp <- 1000 # number of experiments
+n <- 20 # sample size in each experiment
+n.m <- 50 # mean of normal distribution 
+n.sd <- 20 # sd of normal distribution
+ci <- matrix(NA, nrow = nexp, ncol = 2)
+for(E in 1:nexp){
+  ci[E,] <- t.test(rnorm(n, n.m, n.sd), conf.level = 1-alpha)$conf.int
+}
+
+mean(n.m > ci[,1] & n.m < ci[,2])
+```
+
+## Sample from a gamma distribution
 ```{r}
 
 ```
+
+### Width variability
+
+### Coverage
+
+# Take-home exercises
+
+- repeat for different nboot
+- plot mean width/coverage as a function of nboot
 

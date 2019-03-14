@@ -20,6 +20,12 @@ library(tibble)
 sessionInfo()
 ```
 
+# Relationship between SEM and SD of population
+
+Standard error of the mean = standard deviation of the sampling distribution of the sample mean
+
+https://www.khanacademy.org/math/ap-statistics/sampling-distribution-ap/sampling-distribution-mean/v/standard-error-of-the-mean
+
 # Reaction time example
 ```{r}
 
@@ -31,6 +37,11 @@ sessionInfo()
 ```
 
 # Example using the mean
+
+Sampling distributions:
+theory vs. empirical results in the presence of skewness
+https://stackoverflow.com/questions/51043753/overlay-histogram-with-empirical-density-and-dnorm-function
+
 ```{r}
 
 ```
@@ -39,15 +50,44 @@ sessionInfo()
 
 [Blog post](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/) on how to use `rlnorm()`.
 
+## Illustrate lognormal
 ```{r}
-m <- 7
-s <- 75
+m <- 5
+s <- 5
 location <- log(m^2 / sqrt(s^2 + m^2))
 shape <- sqrt(log(1 + (s^2 / m^2)))
-print(paste("location:", location))
-print(paste("shape:", shape))
-draws3 <- rlnorm(n=1000000, location, shape)
+x <- seq(0, 20, .05)
+ggplot(as_tibble(x), aes(value)) +
+  stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape))
+```
 
+## Sample from lognormal distribution 
+```{r}
+set.seed(777)
+m <- 5
+s <- 5
+location <- log(m^2 / sqrt(s^2 + m^2))
+shape <- sqrt(log(1 + (s^2 / m^2)))
+
+# population mean?
+lnorm.pop.m <- mean(rlnorm(1000000, meanlog = location, sdlog = shape))
+
+n <- 20
+nsamp <- 10000
+# nsamp experiments in one go + compute mean for each one:
+dist.samp <- apply(matrix(rlnorm(n*nsamp, meanlog = location, sdlog = shape), nrow = nsamp), 1, mean)
+
+v <- as_tibble(dist.samp) 
+ggplot(v, aes(x = value)) +
+        geom_histogram(aes(y = ..density..), 
+                       bins = 40,  colour = "black", fill = "white") +
+        geom_line(aes(y = ..density.., colour = "orange1"), stat = 'density', size = 1) +     
+  theme(legend.position = "none",
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        legend.text = element_text(size = 12),
+      legend.title = element_text(size = 14)
+       )
 ```
 
 
