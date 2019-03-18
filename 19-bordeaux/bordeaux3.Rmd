@@ -20,6 +20,120 @@ library(tibble)
 sessionInfo()
 ```
 
+```{r}
+# population
+m <- 50
+sd <- 10
+ggplot(data.frame(x = c(0, 100)), aes(x)) + theme_linedraw() +
+  stat_function(fun = dnorm, args = list(mean = m, sd = sd)) + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("Normal distribution: mean = ",m,", sd = ",sd))
+```
+
+```{r}
+# one sample
+set.seed(4)
+n <- 20
+samp <- rnorm(n, m, sd)
+ggplot(data.frame(x = c(0, 100)), aes(x)) + theme_linedraw() +
+  stat_function(fun = dnorm, args = list(mean = m, sd = sd)) +
+  geom_vline(xintercept = samp, colour = "grey") + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("Normal distribution: mean = ",m,", sd = ",sd))
+```
+
+```{r}
+# one sample + mean
+set.seed(4)
+n <- 20
+samp <- rnorm(n, m, sd)
+ggplot(data.frame(x = c(0, 100)), aes(x)) + theme_linedraw() +
+  stat_function(fun = dnorm, args = list(mean = m, sd = sd)) +
+  geom_vline(xintercept = samp, colour = "grey") +
+  geom_vline(xintercept = mean(samp), size = 2) + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste("Sample mean =",round(mean(samp),digits=1),", sd = ",round(sd(samp),digits=1)))
+```
+
+```{r}
+# sampling distribution
+set.seed(111) 
+n <- 20
+nsim <- 10000
+samp.dist <- apply(matrix(rnorm(n*nsim, m, sd),nrow = nsim), 1, mean)
+
+ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
+  geom_histogram(colour = "black", fill = "white", bins = 50) +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste(nsim,"sample means: mean =",round(mean(samp.dist),digits=1),", sd = ",round(sd(samp.dist),digits=2)))
+```
+
+# Standard error of the mean
+
+SEM = population sd / sqrt(n)
+
+```{r}
+sd / sqrt(n)
+```
+SEM = sd of sampling distribution of the sample mean
+
+```{r}
+sd(samp.dist)
+```
+
+# t-test confidence interval
+
+```{r}
+# one sample
+set.seed(4)
+n <- 20
+samp <- rnorm(n, m, sd)
+t.test(samp)
+```
+
+T-value
+```{r}
+# Formula
+samp.m <- mean(samp) # sample mean
+samp.v <- var(samp) # sample variance
+sem <- sqrt(samp.v/n) # standard error of the mean
+samp.t <- samp.m / sem
+samp.t
+```
+
+confidence interval
+```{r}
+alpha <- 0.05
+df <- n-1 # degrees of freedom
+ci <- vector("numeric",2)
+ci[1] <- samp.m - qt(1-alpha/2, df)  * sem
+ci[2] <- samp.m + qt(1-alpha/2, df)  * sem
+ci
+```
+
+t distribution
+```{r}
+ggplot(data.frame(x = c(-5, 5)), aes(x)) + theme_linedraw() +
+  stat_function(fun = dt, args = list(df = df)) + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("t distribution: df = ",df,", ",(1-alpha/2)*100,"th quantile = ",round(qt(1-alpha/2, df), digits=2))) +
+  geom_vline(xintercept = c(-qt(1-alpha/2, df), qt(1-alpha/2, df)), colour = "green", size = 1)
+```
+
 # Relationship between SEM and SD of population
 
 Standard error of the mean = standard deviation of the sampling distribution of the sample mean

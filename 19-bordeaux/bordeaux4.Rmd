@@ -780,7 +780,7 @@ You could do it by hand by re-using the chunk of code from the start.
 
 ```
 
-Or use Wilcox's functions.
+Or use Wilcox's functions for independent groups
 ```{r, eval = FALSE}
 # to compare any estimators
 pb2gen(x, y, alpha=0.05, nboot=1000, est=median, SEED=FALSE)
@@ -793,6 +793,14 @@ comvar2()
 # For robust measures of scale, use pb2gen
 ```
 
+Dependent groups
+```{r}
+# percentile bootstrap using any estimator
+#default to difference scores - dif=TRUE
+bootdpci(x,y,est=median)
+# to compare two variances
+comdvar(x,y,alpha=0.05)
+```
 
 
 

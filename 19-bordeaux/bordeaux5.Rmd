@@ -20,11 +20,290 @@ library(tibble)
 sessionInfo()
 ```
 
-Functions from Rand Wilcox
+# Functions from Rand Wilcox
+
+## One-sample
 ```{r, eval = FALSE}
 # source('./code/Rallfun-v35.txt')
-trimcibt(x, tr=0.2, alpha=0.1, nboot=1000, side=TRUE)
+trimcibt(x, tr=0.2, alpha=0.1, nboot=1000, side=FALSE)
 # tr = amount of trimming
+# side = FALSE for an equal-tailed confidence interval
 # side = TRUE for a symmetric confidence interval
+```
+
+## Two independent groups
+```{r, eval = FALSE}
+yuenbt(x,y,tr=0.2,alpha=0.05,nboot=599,side=FALSE)
+```
+
+## Two dependent groups
+```{r, eval = FALSE}
+ydbt(x,y,tr=0.2,alpha=0.05,nboot=599,side=FALSE,plotit=TRUE,op=1)
+```
+
+# Expected vs. empirical t distributions
+
+```{r}
+# population
+m <- 50
+s <- 20
+location <- log(m^2 / sqrt(s^2 + m^2))
+shape <- sqrt(log(1 + (s^2 / m^2)))
+
+ggplot(data.frame(x = c(0, 130)), aes(x)) + theme_linedraw() +
+  stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape)) + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",s))
+```
+
+```{r}
+# sampling distribution
+set.seed(111) 
+n <- 20
+nsim <- 10000
+samp.dist <- apply(matrix(rlnorm(n*nsim, location, shape),nrow = nsim), 1, mean)
+
+ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white", bins = 50) +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste(nsim,"sample means: mean =",round(mean(samp.dist),digits=1),", sd = ",round(sd(samp.dist),digits=2)))
+```
+
+```{r}
+# one sample
+set.seed(4)
+n <- 20
+samp <- rlnorm(n, location, shape)
+t.test(samp)
+```
+
+T-value
+```{r}
+# Formula
+tval <- function(x,nv){
+  tval <- (mean(x) - nv) / sqrt(var(x)/length(x))
+  tval
+}
+```
+
+Theoretical t distribution
+```{r}
+df <- n-1
+
+ggplot(data.frame(x = c(-5, 5)), aes(x)) + theme_linedraw() +
+  stat_function(fun = dt, args = list(df = df)) + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("t distribution: df = ",df))
+```
+
+```{r}
+# expected quantile to use in CI formula
+alpha <- 0.05
+qt.th<- qt(1-alpha/2, df)
+qt.th
+```
+
+
+```{r}
+# sampling distribution of t
+set.seed(111) 
+n <- 20
+nsim <- 10000
+samp.dist <- apply(matrix(rlnorm(n*nsim, location, shape),nrow = nsim), 1, tval, nv = m)
+
+ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
+  geom_histogram(aes(y=..density..), 
+                 colour = "black", fill = "white", bins = 50) +
+  # stat_function(fun = dt, args = list(df = df)) + 
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste(nsim,"sample t values: mean =",round(mean(samp.dist),digits=1)))
+```
+
+```{r}
+# sampling distribution of t + theoretical
+set.seed(111) 
+n <- 20
+nsim <- 10000
+samp.dist <- apply(matrix(rlnorm(n*nsim, location, shape),nrow = nsim), 1, tval, nv = m)
+
+ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
+  geom_histogram(aes(y=..density..), 
+                 colour = "black", fill = "white", bins = 50) +
+  stat_function(fun = dt, args = list(df = df), colour = "red") + 
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste(nsim,"sample t values vs. empirical t values"))
+```
+
+```{r}
+# quantiles based on sampling distribution
+qt.emp <- quantile(samp.dist, c(alpha/2, 1-(alpha/2)))
+```
+
+```{r}
+# sampling distribution of t + theoretical:
+# quantile t values
+set.seed(111) 
+n <- 20
+nsim <- 10000
+samp.dist <- apply(matrix(rlnorm(n*nsim, location, shape),nrow = nsim), 1, tval, nv = m)
+
+ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
+  geom_histogram(aes(y=..density..), 
+                 colour = "black", fill = "white", bins = 50) +
+  geom_vline(xintercept = qt.emp, colour = "black", size = 1.5) +
+  geom_vline(xintercept = c(-qt.th,qt.th) , colour = "red", size = 1.5) +
+  stat_function(fun = dt, args = list(df = df), colour = "red") + 
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste(nsim,"sample t values vs. empirical t values"))
+```
+
+## Different confidence intervals
+
+Standard confidence interval using t value theoretical sampling distribution
+```{r, fig.height=1}
+set.seed(21)
+n <- 20
+samp <- rlnorm(n, location, shape)
+ci.st <- t.test(samp)$conf.int
+ggplot(data = data.frame(x = rep("gr", n), y = samp), aes(x=x,y=y)) +
+  theme_linedraw() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank()) +
+  geom_jitter(alpha = 0.5) +
+  geom_hline(yintercept = mean(samp)) +
+  geom_segment(y = ci.st[1], yend = ci.st[2], x = 1, xend = 1, colour = "red") +
+  scale_y_continuous(breaks = seq(20, 100, 10)) +
+  coord_flip()
+```
+
+Check values
+```{r}
+ci.st
+```
+
+Check confidence interval by hand
+```{r}
+alpha <- 0.05
+df <- n-1 # degrees of freedom
+samp.m <- mean(samp)
+sem <- sd(samp) / sqrt(n)
+ci <- vector("numeric",2)
+ci[1] <- samp.m - qt(1-alpha/2, df)  * sem
+ci[2] <- samp.m + qt(1-alpha/2, df)  * sem
+ci
+```
+
+Confidence interval using empiricial t value sampling distribution
+```{r}
+alpha <- 0.05
+df <- n-1 # degrees of freedom
+samp.m <- mean(samp)
+sem <- sd(samp) / sqrt(n)
+ci.emp <- vector("numeric",2)
+ci.emp[1] <- samp.m - qt.emp[2]  * sem
+ci.emp[2] <- samp.m - qt.emp[1]  * sem
+ci.emp
+```
+
+Add CI using empirical t distribution
+```{r, fig.height=1}
+set.seed(21)
+n <- 20
+samp <- rlnorm(n, location, shape)
+ci.st <- t.test(samp)$conf.int
+ggplot(data = data.frame(x = rep("gr", n), y = samp), aes(x=x,y=y)) +
+  theme_linedraw() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank()) +
+  geom_jitter(alpha = 0.5) +
+  geom_hline(yintercept = mean(samp)) +
+  geom_segment(y = ci.st[1], yend = ci.st[2], x = 1, xend = 1, colour = "red") +
+  geom_segment(y = ci.emp[1], yend = ci.emp[2], x = 1.02, xend = 1.02, colour = "black") +
+  scale_y_continuous(breaks = seq(20, 100, 10)) +
+  coord_flip()
+```
+
+# Percentile t-bootstrap confidence interval
+```{r}
+set.seed(333)
+out <- trimcibt(samp, tr=0, alpha=0.05, nboot=1000, side=FALSE, SEED = FALSE)
+out
+```
+
+## Bootstrap estimate of the sampling distribution of t
+```{r}
+set.seed(333)
+nboot <- 1000
+tr <- 0
+alpha <- 0.05 
+ibot <- round(alpha*nboot/2)
+itop <- nboot-ibot
+sem <- sd(samp)/sqrt(n)
+samp.m <- mean(samp, tr)
+# mean centre the data
+csamp <- samp - mean(samp, trim = tr)
+# sample with replacement
+bootdata <- matrix(sample(csamp,size=n*nboot,replace=TRUE),nrow=nboot)
+boot.tval <- sort(apply(bootdata,1,mean,tr) / (apply(bootdata,1,sd,tr) / sqrt(n)))
+ci.ptb <- samp.m - boot.tval[itop] * sem
+ci.ptb[2] <- samp.m - boot.tval[ibot] * sem
+ci.ptb
+```
+
+## Superimpose t distributions
+Histogram (black) = sampling distribution
+Red = theoretical
+Green = bootstrap t distribution
+
+```{r}
+# sampling distribution of t + theoretical
+set.seed(111) 
+n <- 20
+nsim <- 10000
+samp.dist <- apply(matrix(rlnorm(n*nsim, location, shape),nrow = nsim), 1, tval, nv = m)
+
+ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
+  geom_histogram(aes(y=..density..), 
+                 colour = "black", fill = "white", bins = 50) +
+  stat_function(fun = dt, args = list(df = df), colour = "red", size = 1) + 
+  geom_line(data=tibble(x = boot.tval), aes(x=x, y = ..density..), 
+            stat = 'density', colour = "green3", size = 1) + 
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=18)) +
+  ggtitle(paste(nsim,"sample t values / theoretical t (red) / boot t (green)"))
+```
+
+## Add ptb confidence interval
+```{r, fig.height=1}
+set.seed(21)
+n <- 20
+samp <- rlnorm(n, location, shape)
+ci.st <- t.test(samp)$conf.int
+ggplot(data = data.frame(x = rep("gr", n), y = samp), aes(x=x,y=y)) +
+  theme_linedraw() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank()) +
+  geom_jitter(alpha = 0.5) +
+  geom_hline(yintercept = mean(samp)) +
+  geom_segment(y = ci.st[1], yend = ci.st[2], x = 1, xend = 1, colour = "red") +
+  geom_segment(y = ci.emp[1], yend = ci.emp[2], x = 1.02, xend = 1.02, colour = "black") +
+  geom_segment(y = out$ci[1], yend = out$ci[2], x = 0.98, xend = 0.98, colour = "green3") +
+  scale_y_continuous(breaks = seq(20, 100, 10)) +
+  coord_flip()
 ```
 

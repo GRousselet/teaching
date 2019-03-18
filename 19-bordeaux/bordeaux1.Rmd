@@ -31,10 +31,6 @@ See more detail and updated versions of the code [here](https://dornsife.usc.edu
 
 Some of the functions are also available in the `WRS2` package.
 
-# References
-
-
-
 # Exercise
 
 ## Description
@@ -62,7 +58,7 @@ Enter the data in R or a text file: 5 rows (trials) and 10 columns (participants
 # dice_res[,9] <- c(,,,,)
 # dice_res[,10] <- c(,,,,)
 
-# Save in a txt file, for instance for population 1:
+# Save in a txt file:
 
 # write.table(dice_res, file = "./data/dice_res_blue.txt", row.names=FALSE, col.names=FALSE)
 # write.table(dice_res, file = "./data/dice_res_green.txt", row.names=FALSE, col.names=FALSE)
@@ -79,9 +75,9 @@ res_green <- matrix(scan("./data/res2.txt"), nrow=nt, byrow=TRUE)
 res_blue <- matrix(scan("./data/res3.txt"), nrow=nt, byrow=TRUE)
 ```
 
-## Load data
+## Load real data
 
-```{r}
+```{r, eval = FALSE}
 res_red <- matrix(scan("./data/dice_res_red.txt"), nrow=nt, byrow=TRUE)
 res_green <- matrix(scan("./data/dice_res_green.txt"), nrow=nt, byrow=TRUE)
 res_blue <- matrix(scan("./data/dice_res_blue.txt"), nrow=nt, byrow=TRUE)

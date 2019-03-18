@@ -14,14 +14,170 @@ output:
 # dependencies
 library(ggplot2)
 library(tibble)
+source('./code/Rallfun-v35.txt')
 ```
 
 ```{r}
 sessionInfo()
 ```
 
-Reference on slide 1: "We caution against the fallacy of assuming that that which does not kill statistical significance makes it stronger" (Loken & Gelman, 2017, Science)
+Here we focus on simple examples: 
+- one-sample
+- two independent samples
+- two dependent samples
 
-"The strategy of run-a-crappy-study, get p less than .05, come up with a cute story based on evolutionary psychology, and PROFIT . . . well, it does not work anymore. OK, maybe it still can work if your goal is to get published in PPNAS, get tenure, give Ted talks, and make boatloads of money in speaking fees. But it will not work in the real sense, the important sense of learning about the world." 
+For inferences on multiple quantiles, see these guides about the [shift function](https://github.com/GRousselet/rogme) and the [hierarchical shift function](https://github.com/GRousselet/rogme/blob/master/docs/hsf.md).
 
-"Trying to use a survey of 3,000 people to estimate tiny differences in sex ratios: this makes about as much sense as using a bathroom scale to weigh a feather, when that feather is resting loosely in the pouch of a kangaroo that is vigorously jumping up and down." (Gelman, 2018, *Personality and Social Psychology Bulletin*)
+# Quantiles
+```{r}
+# check help, many techniques available
+xf<-rnorm(100)
+quantile(xf)
+# Harrel-Davis estimator of the quantiles
+hd(xf,q=.5) # Harrel-Davis estimate of the median
+# ideal fourths
+idealf(xf) # better 1st and 3rd quartiles?
+```
+
+# Discarding outliers 
+
+Crazy example
+```{r}
+x <- c(2,2,3,3,3,4,4,4,100000,100000)
+```
+
+## Boxplot rule
+outbox(x)
+res<-outbox(x)
+xclean<-x[res$keep]
+
+# 2 SD away from the mean rule
+k<-2
+res<-(abs(x-mean(x))/sd(x))>k
+x[res]
+
+# MAD median rule
+k<-2.24
+(abs(x-median(x))/(mad(x)))>k
+#out(x)
+
+# Measures of central tendency 
+
+## Mean vs. median
+```{r}
+x<-seq(0.05,4,0.05)
+fx<-df(x,6,18) #fx<-dlnorm(x)
+plot(x,fx,type="l")
+n<-10000
+samp<-rf(n,6,18)
+mx<-mean(samp)
+mdx<-median(samp)
+arrows( mx,df(mx,6,18),mx,0,col='red')
+arrows( mdx,df(mdx,6,18),mdx,0,col='green')
+```
+
+## Trimmed means
+
+### Illustrate 20% trimming - Normal distribution
+```{r}
+tr<-.2
+xv<-seq(-4,4,0.01)
+yv<-dnorm(xv)
+plot(xv,yv,type="l")
+zval<-qnorm(tr, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+polygon(c(xv[xv<=zval],zval),c(yv[xv<=zval],yv[xv==-4]),col=5)
+polygon(c(xv[xv>=-zval],-zval),c(yv[xv>=-zval],yv[xv==4]),col=5)
+```
+
+## Illustrate 20% trimming - F distribution
+```{r}
+tr<-.2
+xv<-seq(0.01,4,0.01)
+yv<-df(xv,6,18) #fx<-dlnorm(x)
+plot(xv,yv,type="l")
+zval<-qf(tr,6,18)
+polygon(c(xv[xv<=zval],zval),c(yv[xv<=zval],yv[xv==0.01]),col=5)
+zval<-qf(1-tr,6,18)
+polygon(c(xv[xv>=zval],zval),c(yv[xv>=zval],yv[xv==4]),col=5)
+```
+
+
+## example: get trimmed means of all columns of 
+```{r}
+set.seed(21)
+v <- matrix(rnorm(50), nrow = 10) # reshape into 10 x 5 matrix
+apply(v, 2, mean, tr=.2) # compute trimmed mean for each column
+```
+
+
+# Winzorised mean
+```{r, eval = FALSE}
+winmean(x,tr=.2)
+```
+
+# Winzorised variance
+```{r, eval = FALSE}
+winvar(x,tr=.2)
+```
+
+# Standard error of the trimmed mean
+```{r, eval = FALSE}
+trimse(x,tr=.2)
+```
+
+# compare techniques
+```{r}
+self<-t(read.table("./data/self-awareness.csv",header=F))
+stripchart(self, method="jitter", pch=1)
+cbind(mean=round(mean(self),digits=1),median=median(self),tm=round(tmean(self,tr=.2),digits=1))
+```
+
+
+# Tests and confidence intervals for groups
+
+## Independent groups
+
+### Kolmogorov-Smirnov test
+
+See explanation in this [blog post](https://garstats.wordpress.com/2016/05/02/robust-effect-sizes-for-2-independent-groups/).
+
+## T-tests on means and trimmed means
+```{r}
+yuen(x,y,tr=0.2,alpha=0.05)
+# set tr=0 for a t-test on means
+# compare output to t.test
+```
+
+### Compare medians
+```{r}
+msmed(x,y,alpha=0.05)
+```
+
+## Dependent groups
+
+### T-tests on trimmed means
+```{r}
+yuend(x,y,tr=0.2,alpha=0.05)
+```
+
+### Compare medians
+```{r}
+# use percentile bootstrap - see part 4
+```
+
+# Effect of outlier on mean and t-test
+```{r}
+set.seed(3) # set the seed of the random number generator for reproducibility
+data <- rnorm(10, mean = 1, sd = 1) # get random sample from normal population
+
+summary(data)
+
+data2 <- c(data,5)
+summary(data2)
+x <- list("data"=data, "data2"=data2)
+stripchart(x,method="jitter",pch=1)
+
+t.test(data,mu=0)
+t.test(data2,mu=0)
+```
+
