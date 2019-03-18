@@ -58,7 +58,10 @@ location <- log(m^2 / sqrt(s^2 + m^2))
 shape <- sqrt(log(1 + (s^2 / m^2)))
 x <- seq(0, 20, .05)
 ggplot(as_tibble(x), aes(value)) +
-  stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape))
+  theme_linedraw() +
+  stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape), size = 1) +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14))
 ```
 
 ## Sample from lognormal distribution 
@@ -81,7 +84,8 @@ v <- as_tibble(dist.samp)
 ggplot(v, aes(x = value)) +
         geom_histogram(aes(y = ..density..), 
                        bins = 40,  colour = "black", fill = "white") +
-        geom_line(aes(y = ..density.., colour = "orange1"), stat = 'density', size = 1) +     
+        geom_line(aes(y = ..density..), stat = 'density', size = 1, colour = "orange1") +  
+  geom_vline(xintercept = lnorm.pop.m, size = 1.5, colour = "red") + 
   theme(legend.position = "none",
         axis.title = element_text(size = 16),
         axis.text = element_text(size = 14),

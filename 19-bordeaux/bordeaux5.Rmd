@@ -19,3 +19,12 @@ library(tibble)
 ```{r}
 sessionInfo()
 ```
+
+Functions from Rand Wilcox
+```{r, eval = FALSE}
+# source('./code/Rallfun-v35.txt')
+trimcibt(x, tr=0.2, alpha=0.1, nboot=1000, side=TRUE)
+# tr = amount of trimming
+# side = TRUE for a symmetric confidence interval
+```
+

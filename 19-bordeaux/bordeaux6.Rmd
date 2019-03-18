@@ -14,8 +14,72 @@ output:
 # dependencies
 library(ggplot2)
 library(tibble)
+source("./code/Rallfun-v35.txt")
 ```
 
 ```{r}
 sessionInfo()
+```
+
+# Generate data
+```{r}
+
+```
+
+# Percentile bootstrap confidence interval
+```{r, eval=FALSE}
+# Pearson correlation
+pcorb(x,y)
+# percentage bend correlation
+corb(x,y, corfun = pbcor)
+# 25% Winsorized correlation
+corb(x,y, corfun=wincor, tr=0.25)
+```
+
+# Compare correlations
+
+## Independent case
+
+### Two Pearson correlations
+```{r}
+twopcor(x1,y1,x2,y2, SEED = FALSE)
+```
+
+### Two robust correlations
+```{r}
+twocor(x1,y1,x2,y2, corfun = pbcor, SEED = FALSE)
+```
+
+
+## Dependent case
+
+### Overlapping case
+For instance, if we have 3 dependent variables, we want to compare the correlation between 1 and 2 to the correlation between 1 and 3.
+
+For Pearson correlation:
+```{r}
+# x = matrix with 2 columns
+# y = vector
+TWOpov(x,y)
+#TWOpovPV to get a p-value
+```
+
+For a robust correlation:
+```{r}
+twoDcorR(x,y, corfun=wincor, SEED=FALSE)
+```
+
+### Non-overlapping case
+For instance, if we have 4 dependent variables, we want to compare the correlation between 1 and 2 to the correlation between 3 and 4.
+
+For Pearson correlation:
+```{r}
+# x = matrix with 2 columns
+# y = matrix with 2 columns
+TWOpNOV(x,y)
+```
+
+For a robust correlation:
+```{r}
+twoDNOV(x,y, corfun=wincor, SEED=FALSE)
 ```
