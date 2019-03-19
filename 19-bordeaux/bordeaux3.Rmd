@@ -31,6 +31,7 @@ labs(y = "Density") +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste0("Normal distribution: mean = ",m,", sd = ",sd))
+# ggsave(filename = "b3_normdist.pdf")
 ```
 
 ```{r}
@@ -46,6 +47,7 @@ labs(y = "Density") +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste0("Normal distribution: mean = ",m,", sd = ",sd))
+# ggsave(filename = "b3_normdist_1samp.pdf")
 ```
 
 ```{r}
@@ -62,6 +64,7 @@ labs(y = "Density") +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste("Sample mean =",round(mean(samp),digits=1),", sd = ",round(sd(samp),digits=1)))
+# ggsave(filename = "b3_normdist_1samp_mean.pdf")
 ```
 
 ```{r}
@@ -72,21 +75,26 @@ nsim <- 10000
 samp.dist <- apply(matrix(rnorm(n*nsim, m, sd),nrow = nsim), 1, mean)
 
 ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
-  geom_histogram(colour = "black", fill = "white", bins = 50) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "white", bins = 50) +
   theme(axis.text = element_text(size = 14),
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste(nsim,"sample means: mean =",round(mean(samp.dist),digits=1),", sd = ",round(sd(samp.dist),digits=2)))
+# ggsave(filename = "b3_normdist_10000samp_mean.pdf")
 ```
 
 # Standard error of the mean
 
 SEM = population sd / sqrt(n)
 
+Usually estimated using sample sd / sqrt(n)
+
 ```{r}
 sd / sqrt(n)
 ```
 SEM = sd of sampling distribution of the sample mean
+
+https://www.khanacademy.org/math/ap-statistics/sampling-distribution-ap/sampling-distribution-mean/v/standard-error-of-the-mean
 
 ```{r}
 sd(samp.dist)
@@ -94,6 +102,7 @@ sd(samp.dist)
 
 # t-test confidence interval
 
+## Get one sample and apply t.test() function
 ```{r}
 # one sample
 set.seed(4)
@@ -102,7 +111,7 @@ samp <- rnorm(n, m, sd)
 t.test(samp)
 ```
 
-T-value
+## Compute t value
 ```{r}
 # Formula
 samp.m <- mean(samp) # sample mean
@@ -112,17 +121,7 @@ samp.t <- samp.m / sem
 samp.t
 ```
 
-confidence interval
-```{r}
-alpha <- 0.05
-df <- n-1 # degrees of freedom
-ci <- vector("numeric",2)
-ci[1] <- samp.m - qt(1-alpha/2, df)  * sem
-ci[2] <- samp.m + qt(1-alpha/2, df)  * sem
-ci
-```
-
-t distribution
+## t distribution and quantiles
 ```{r}
 ggplot(data.frame(x = c(-5, 5)), aes(x)) + theme_linedraw() +
   stat_function(fun = dt, args = list(df = df)) + 
@@ -134,30 +133,14 @@ labs(y = "Density") +
   geom_vline(xintercept = c(-qt(1-alpha/2, df), qt(1-alpha/2, df)), colour = "green", size = 1)
 ```
 
-# Relationship between SEM and SD of population
-
-Standard error of the mean = standard deviation of the sampling distribution of the sample mean
-
-https://www.khanacademy.org/math/ap-statistics/sampling-distribution-ap/sampling-distribution-mean/v/standard-error-of-the-mean
-
-# Reaction time example
+## Compute confidence interval
 ```{r}
-
-```
-
-# Correlation example
-```{r}
-
-```
-
-# Example using the mean
-
-Sampling distributions:
-theory vs. empirical results in the presence of skewness
-https://stackoverflow.com/questions/51043753/overlay-histogram-with-empirical-density-and-dnorm-function
-
-```{r}
-
+alpha <- 0.05
+df <- n-1 # degrees of freedom
+ci <- vector("numeric",2)
+ci[1] <- samp.m - qt(1-alpha/2, df)  * sem
+ci[2] <- samp.m + qt(1-alpha/2, df)  * sem
+ci
 ```
 
 # Example using the lognormal
@@ -166,6 +149,7 @@ https://stackoverflow.com/questions/51043753/overlay-histogram-with-empirical-de
 
 ## Illustrate lognormal
 ```{r}
+# population
 m <- 5
 s <- 5
 location <- log(m^2 / sqrt(s^2 + m^2))
@@ -174,11 +158,34 @@ x <- seq(0, 20, .05)
 ggplot(as_tibble(x), aes(value)) +
   theme_linedraw() +
   stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape), size = 1) +
+  labs(y = "Density") +
   theme(axis.title = element_text(size = 16),
-        axis.text = element_text(size = 14))
+        axis.text = element_text(size = 14),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",sd))
+# ggsave(filename = "b3_lnormdist.pdf")
 ```
 
-## Sample from lognormal distribution 
+## One sample from lognormal distribution 
+```{r}
+set.seed(777)
+n <- 20
+samp <- rlnorm(n, meanlog = location, sdlog = shape)
+x <- seq(0, 20, .05)
+ggplot(as_tibble(x), aes(value)) +
+  theme_linedraw() +
+  stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape), size = 1) +
+  geom_vline(xintercept = samp, colour = "grey") + 
+  geom_vline(xintercept = mean(samp), size = 1.5) + 
+labs(y = "Density") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        plot.title = element_text(size=20)) +
+  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",sd))
+# ggsave(filename = "b3_lnormdist_1samp.pdf")
+```
+
+## Many samples from lognormal distribution 
 ```{r}
 set.seed(777)
 m <- 5
@@ -195,17 +202,14 @@ nsamp <- 10000
 dist.samp <- apply(matrix(rlnorm(n*nsamp, meanlog = location, sdlog = shape), nrow = nsamp), 1, mean)
 
 v <- as_tibble(dist.samp) 
-ggplot(v, aes(x = value)) +
-        geom_histogram(aes(y = ..density..), 
-                       bins = 40,  colour = "black", fill = "white") +
-        geom_line(aes(y = ..density..), stat = 'density', size = 1, colour = "orange1") +  
-  geom_vline(xintercept = lnorm.pop.m, size = 1.5, colour = "red") + 
-  theme(legend.position = "none",
+ggplot(v, aes(x = value)) + theme_linedraw() +
+        geom_histogram(aes(y = ..density..), colour = "black", fill = "white", bins = 50) +
+  # geom_vline(xintercept = mean(dist.samp), size = 1.5) + 
+  theme(axis.text = element_text(size = 14),
         axis.title = element_text(size = 16),
-        axis.text = element_text(size = 14),
-        legend.text = element_text(size = 12),
-      legend.title = element_text(size = 14)
-       )
+        plot.title = element_text(size=20)) +
+  ggtitle(paste(nsim,"sample means: mean =",round(mean(dist.samp),digits=1),", sd = ",round(sd(dist.samp),digits=2)))
+# ggsave(filename = "b3_lnormdist_10000samp_mean.pdf")
 ```
 
 

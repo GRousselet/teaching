@@ -32,6 +32,8 @@ trimcibt(x, tr=0.2, alpha=0.1, nboot=1000, side=FALSE)
 ```
 
 ## Two independent groups
+
+That's the one you could try on your data.
 ```{r, eval = FALSE}
 yuenbt(x,y,tr=0.2,alpha=0.05,nboot=599,side=FALSE)
 ```
@@ -57,6 +59,7 @@ labs(y = "Density") +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",s))
+ # ggsave(filename = './lnorm_dist.pdf')
 ```
 
 ```{r}
@@ -72,6 +75,7 @@ ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste(nsim,"sample means: mean =",round(mean(samp.dist),digits=1),", sd = ",round(sd(samp.dist),digits=2)))
+# ggsave(filename = './lnorm_sampdist.pdf')
 ```
 
 ```{r}
@@ -102,6 +106,7 @@ labs(y = "Density") +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste0("t distribution: df = ",df))
+# ggsave(filename = './theor_t.pdf')
 ```
 
 ```{r}
@@ -127,6 +132,7 @@ ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste(nsim,"sample t values: mean =",round(mean(samp.dist),digits=1)))
+# ggsave(filename = './sampdist_t.pdf')
 ```
 
 ```{r}
@@ -144,6 +150,7 @@ ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste(nsim,"sample t values vs. empirical t values"))
+# ggsave(filename = './comp_theor_samp_t.pdf')
 ```
 
 ```{r}
@@ -169,6 +176,7 @@ ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
   ggtitle(paste(nsim,"sample t values vs. empirical t values"))
+# ggsave(filename = './comp_theor_samp_t_q.pdf')
 ```
 
 ## Different confidence intervals
@@ -188,6 +196,7 @@ ggplot(data = data.frame(x = rep("gr", n), y = samp), aes(x=x,y=y)) +
   geom_segment(y = ci.st[1], yend = ci.st[2], x = 1, xend = 1, colour = "red") +
   scale_y_continuous(breaks = seq(20, 100, 10)) +
   coord_flip()
+# ggsave(filename = './ci1.pdf')
 ```
 
 Check values
@@ -235,6 +244,7 @@ ggplot(data = data.frame(x = rep("gr", n), y = samp), aes(x=x,y=y)) +
   geom_segment(y = ci.emp[1], yend = ci.emp[2], x = 1.02, xend = 1.02, colour = "black") +
   scale_y_continuous(breaks = seq(20, 100, 10)) +
   coord_flip()
+# ggsave(filename = './ci2.pdf')
 ```
 
 # Percentile t-bootstrap confidence interval
@@ -286,6 +296,7 @@ ggplot(data.frame(x=samp.dist), aes(x)) + theme_linedraw() +
         axis.title = element_text(size = 16),
         plot.title = element_text(size=18)) +
   ggtitle(paste(nsim,"sample t values / theoretical t (red) / boot t (green)"))
+ggsave(filename = './comp_theor_samp_boot_t.pdf')
 ```
 
 ## Add ptb confidence interval
@@ -305,5 +316,6 @@ ggplot(data = data.frame(x = rep("gr", n), y = samp), aes(x=x,y=y)) +
   geom_segment(y = out$ci[1], yend = out$ci[2], x = 0.98, xend = 0.98, colour = "green3") +
   scale_y_continuous(breaks = seq(20, 100, 10)) +
   coord_flip()
+# ggsave(filename = './ci3.pdf')
 ```
 

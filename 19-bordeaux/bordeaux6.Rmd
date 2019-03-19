@@ -22,23 +22,155 @@ sessionInfo()
 ```
 
 # Generate data
-```{r}
 
+In this example we sample from 2 uncorrelated variables. By chance there seems to be a non negligeable correlation. Changing the random seed or commenting out the line `set.seed(21)` will give different results. You can also sample trials from variables with a true correlation by changing `rho`.
+
+```{r}
+set.seed(21)
+n <- 50 # sample size
+mu <- c(0, 0) # means of the variables
+rho <- 0 # correlation between variables
+sigma <- matrix(c(1, rho, rho, 1), nrow = 2, byrow = TRUE) # covariance matrix
+data <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+x <- data[,1]
+y <- data[,2]
+
+# make data frame
+df <- tibble(x = x,
+             y = y)
+
+# ggplot figure
+ggplot(df, aes(x = x, y = y)) + theme_classic() +
+  # geom_hline(yintercept = 0) +
+  # geom_vline(xintercept = 0) +
+  geom_point(alpha = 0.6, size = 3) +
+  geom_smooth(method='lm',formula=y~x) +
+  theme(axis.title = element_text(size = 15, colour = "black"),
+        axis.text = element_text(size = 13, colour = "black"),
+        strip.text = element_text(size = 15, face = "bold")) +
+  # scale_x_continuous(limits = c(-4, 4),
+  #                    breaks = seq(-4, 4, 1)) +
+  labs(x = expression(italic("Variable A")), y = expression(italic("Variable B")))
+# ggsave(filename = "./corr_samp.pdf")
+```
+
+# Pearson's correlation
+```{r}
+out <- cor.test(x,y, method = "pearson")
+out
 ```
 
 # Percentile bootstrap confidence interval
-```{r, eval=FALSE}
-# Pearson correlation
-pcorb(x,y)
-# percentage bend correlation
-corb(x,y, corfun = pbcor)
-# 25% Winsorized correlation
-corb(x,y, corfun=wincor, tr=0.25)
+
+## Pearson correlation
+```{r}
+pcorb(x,y, SEED = FALSE)
+```
+
+### Pearson correlation: detailed code
+```{r}
+set.seed(21)
+nboot <- 599
+# sample pairs of observations with replacement
+data <- matrix(sample(length(y),size=length(y)*nboot,replace=TRUE),nrow=nboot)
+# compute correlation for each pair
+bvec <- apply(data,1,pcorbsub,x,y) # A 1 by nboot matrix.
+# confidence interval is computed using special adjustments to account for heteroscedasticity
+ilow<-15
+ihi<-584
+if(length(y) < 250){
+ilow<-14
+ihi<-585
+}
+if(length(y) < 180){
+ilow<-11
+ihi<-588
+}
+if(length(y) < 80){
+ilow<-8
+ihi<-592
+}
+if(length(y) < 40){
+ilow<-7
+ihi<-593
+}
+bsort <- sort(bvec)
+ci <-c (bsort[ilow],bsort[ihi])
+
+ggplot(as_tibble(bvec), aes(x = value)) + theme_bw() +
+  geom_histogram(aes(y = ..density..), bins = 50,
+                 fill = "white", colour = "black") +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16)) +
+  labs(x = "Bootstrap correlations") 
+# ggsave(filename = "./pboot_dist.pdf")
+```
+
+## percentage bend correlation
+```{r}
+corb(x,y, corfun = pbcor, SEED = FALSE)
+```
+
+## 25% Winsorized correlation
+```{r}
+corb(x,y, corfun=wincor, tr=0.25, SEED = FALSE)
+```
+
+## skipped correlation: Pearson
+```{r}
+mscor(cbind(x,y),corfun=pcor)
+```
+
+## skipped correlation: Spearman
+```{r}
+mscor(cbind(x,y),corfun=spear)
 ```
 
 # Compare correlations
 
+The design of the study presented in Davis et al. (2008) is a mix between the independent and dependent cases: there are 2 independent groups, and for each group there are 3 dependent measurements. To build confidence intervals for the differences of differences of correlations, you would need to write your own code. Let's look at the simpler cases.
+
 ## Independent case
+
+Generate data
+```{r}
+set.seed(21)
+n <- 50 # sample size
+mu <- c(0, 0) # means of the variables
+rho <- 0 # correlation between variables
+sigma <- matrix(c(1, rho, rho, 1), nrow = 2, byrow = TRUE) # covariance matrix
+
+# group 1
+data <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+x1 <- data[,1]
+y1 <- data[,2]
+
+# group 2
+data <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+x2 <- data[,1]
+y2 <- data[,2]
+
+# make data frame
+df <- tibble(x = c(x1, x2),
+             y = c(y1, y2),
+             group = factor(c(rep("group1",n),rep("group2",n))))
+
+# ggplot figure
+ggplot(df, aes(x = x, y = y)) + theme_classic() +
+  # geom_hline(yintercept = 0) +
+  # geom_vline(xintercept = 0) +
+  geom_point(alpha = 0.6, size = 3) +
+  geom_smooth(method='lm',formula=y~x) +
+  theme(axis.title = element_text(size = 15, colour = "black"),
+        axis.text = element_text(size = 13, colour = "black"),
+        strip.text = element_text(size = 15, face = "bold")) +
+  # scale_x_continuous(limits = c(-4, 4),
+  #                    breaks = seq(-4, 4, 1)) +
+  labs(x = expression(italic("Variable A")), y = expression(italic("Variable B"))) +
+  facet_grid(cols = vars(group))
+ # ggsave(filename = "./corr_samp_ind.pdf")
+```
+
 
 ### Two Pearson correlations
 ```{r}
@@ -47,14 +179,62 @@ twopcor(x1,y1,x2,y2, SEED = FALSE)
 
 ### Two robust correlations
 ```{r}
-twocor(x1,y1,x2,y2, corfun = pbcor, SEED = FALSE)
+twocor(x1,y1,x2,y2, corfun = pbcor)
 ```
-
 
 ## Dependent case
 
 ### Overlapping case
-For instance, if we have 3 dependent variables, we want to compare the correlation between 1 and 2 to the correlation between 1 and 3.
+For instance, if we have 3 dependent variables, we want to compare the correlation between 1 and 3 to the correlation between 2 and 3.
+
+Generate data
+```{r}
+set.seed(21)
+n <- 50 # sample size
+mu <- c(0, 0, 0) # means of the variables
+rho12 <- 0.8 # correlation between variables 1 and 2
+rho13 <- 0.2 # correlation between variables 1 and 3
+rho23 <- 0.6 # correlation between variables 2 and 3
+# define covariance matrix
+sigma <- matrix(c(1, rho12, rho13, 
+                  rho12, 1, rho23,
+                  rho13, rho23, 1), 
+                nrow = 3, byrow = TRUE) 
+
+data <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+x <- data[,1:2]
+y <- data[,3]
+
+# make data frame
+df <- tibble(x = x[,1],
+             y = y)
+# ggplot figure
+ggplot(df, aes(x = x, y = y)) + theme_classic() +
+  geom_point(alpha = 0.6, size = 3) +
+  geom_smooth(method='lm',formula=y~x) +
+  theme(axis.title = element_text(size = 15, colour = "black"),
+        axis.text = element_text(size = 13, colour = "black"),
+        strip.text = element_text(size = 15, face = "bold")) +
+  # scale_x_continuous(limits = c(-4, 4),
+  #                    breaks = seq(-4, 4, 1)) +
+  labs(x = expression(italic("Variable A")), y = expression(italic("Variable C")))
+ # ggsave(filename = "./corr_samp_dep_ov1.pdf")
+ 
+ # make data frame
+df <- tibble(x = x[,2],
+             y = y)
+# ggplot figure
+ggplot(df, aes(x = x, y = y)) + theme_classic() +
+  geom_point(alpha = 0.6, size = 3) +
+  geom_smooth(method='lm',formula=y~x) +
+  theme(axis.title = element_text(size = 15, colour = "black"),
+        axis.text = element_text(size = 13, colour = "black"),
+        strip.text = element_text(size = 15, face = "bold")) +
+  # scale_x_continuous(limits = c(-4, 4),
+  #                    breaks = seq(-4, 4, 1)) +
+  labs(x = expression(italic("Variable B")), y = expression(italic("Variable C")))
+ # ggsave(filename = "./corr_samp_dep_ov2.pdf")
+```
 
 For Pearson correlation:
 ```{r}
