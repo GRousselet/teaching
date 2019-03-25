@@ -3,11 +3,15 @@ title: "Bordeaux 2019 - robust stats - part 6: correlation"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
-    fig_caption: no
-    number_sections: no
+  github_document:
+    html_preview: yes
     toc: yes
     toc_depth: 2
+  # pdf_document:
+  #   fig_caption: no
+  #   number_sections: no
+  #   toc: yes
+  #   toc_depth: 2
 ---
 
 ```{r message=FALSE, warning=FALSE}

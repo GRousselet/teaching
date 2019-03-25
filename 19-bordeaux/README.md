@@ -21,25 +21,26 @@ The main topics include:
 The slides in pdf format are [here]().
 
 ## Part 1: Introduction 
-[code]()
-[notebook]()
+[code](bordeaux1.Rmd)
+[html notebook](docs/bordeaux1.md)
 
 ## Part 2: 
-[code]()
-[notebook]()
+[code](bordeaux2.Rmd)
+[html notebook](docs/bordeaux2.md)
 
 ## Part 3: 
-[code]()
-[notebook]()
+[code](bordeaux3.Rmd)
+[html notebook](docs/bordeaux3.md)
 
 ## Part 4: 
-[code]()
-[notebook]()
+[code](bordeaux4.Rmd)
+[html notebook](docs/bordeaux4.md)
+[extra notebook](docs/bordeaux4_extra.md)
 
 ## Part 5: 
-[code]()
-[notebook]()
+[code](bordeaux5.Rmd)
+[html notebook](docs/bordeaux5.md)
 
 ## Part 6: 
-[code]()
-[notebook]()
+[code](bordeaux6.Rmd)
+[html notebook](docs/bordeaux6.md)

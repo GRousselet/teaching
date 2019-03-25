@@ -3,11 +3,15 @@ title: "Bordeaux 2019 - robust stats - part 4: percentile bootstrap - confidence
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
-    fig_caption: no
-    number_sections: no
+  github_document:
+    html_preview: yes
     toc: yes
     toc_depth: 2
+  # pdf_document:
+  #   fig_caption: no
+  #   number_sections: no
+  #   toc: yes
+  #   toc_depth: 2
 ---
 
 ```{r message=FALSE, warning=FALSE}
@@ -19,6 +23,9 @@ library(tibble)
 ```{r}
 sessionInfo()
 ```
+
+This section is concerned with the long term performance of our methods, looking in particular at the behaviour of confidence intervals. The demonstrations and exercises proposed here could be expanded by considering the simulations and results from this article:
+[What Teachers Should Know About the Bootstrap: Resampling in the Undergraduate Statistics Curriculum](https://amstat.tandfonline.com/doi/abs/10.1080/00031305.2015.1089789#.XJjIty2cbUI)
 
 # Confidence interval variability
 
