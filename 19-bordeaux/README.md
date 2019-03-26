@@ -32,29 +32,29 @@ Install code and data by downloading this [folder](mat.zip)
 
 [html notebook](docs/bordeaux1.md)
 
-## Part 2: 
+## Part 2: Robust estimation
 [code](bordeaux2.Rmd)
 
 [html notebook](docs/bordeaux2.md)
 
-## Part 3: 
+## Part 3: Sampling distribution
 [code](bordeaux3.Rmd)
 
 [html notebook](docs/bordeaux3.md)
 
-## Part 4: 
+## Part 4: Percentile bootstrap
 [code](bordeaux4.Rmd)
 
 [html notebook](docs/bordeaux4.md)
 
 [extra notebook](docs/bordeaux4_extra.md)
 
-## Part 5: 
+## Part 5: Percentile-t bootstrap
 [code](bordeaux5.Rmd)
 
 [html notebook](docs/bordeaux5.md)
 
-## Part 6: 
+## Part 6: Correlations
 [code](bordeaux6.Rmd)
 
 [html notebook](docs/bordeaux6.md)
