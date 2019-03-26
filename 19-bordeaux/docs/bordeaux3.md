@@ -245,13 +245,13 @@ location <- log(m^2 / sqrt(s^2 + m^2))
 shape <- sqrt(log(1 + (s^2 / m^2)))
 x <- seq(0, 20, .05)
 ggplot(as_tibble(x), aes(value)) +
-  theme_linedraw() +
+  theme_classic() +
   stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape), size = 1) +
   labs(y = "Density") +
   theme(axis.title = element_text(size = 16),
         axis.text = element_text(size = 14),
         plot.title = element_text(size=20)) +
-  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",sd))
+  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",s))
 ```
 
     ## Warning: Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `enframe(name = NULL)` instead.
@@ -272,7 +272,7 @@ n <- 20
 samp <- rlnorm(n, meanlog = location, sdlog = shape)
 x <- seq(0, 20, .05)
 ggplot(as_tibble(x), aes(value)) +
-  theme_linedraw() +
+  theme_classic() +
   stat_function(fun = dlnorm, args = list(meanlog = location, sdlog = shape), size = 1) +
   geom_vline(xintercept = samp, colour = "grey") + 
   geom_vline(xintercept = mean(samp), size = 1.5) + 
@@ -280,7 +280,7 @@ labs(y = "Density") +
   theme(axis.text = element_text(size = 14),
         axis.title = element_text(size = 16),
         plot.title = element_text(size=20)) +
-  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",sd))
+  ggtitle(paste0("Log normal distribution: mean = ",m,", sd = ",s))
 ```
 
 ![](bordeaux3_files/figure-markdown_github/unnamed-chunk-14-1.png)

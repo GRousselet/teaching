@@ -4,9 +4,9 @@ Description on [urfist website](https://sygefor.reseau-urfist.fr/#/training/7680
 
 This workshop provides an introduction to statistical assessment of data using robust estimators, techniques to build confidence intervals such as the percentile bootstrap, and detailed graphical representations. The philosophy underpinning the workshop is described in these articles:
 
-Rousselet, Guillaume A., John J. Foxe, and J. Paul Bolam. 2016. ‘A Few Simple Steps to Improve the Description of Group Results in Neuroscience’. European Journal of Neuroscience 44 (9): 2647–51. [pdf](https://doi.org/10.1111/ejn.13400) [preprint]() [reproducibility package]() .
+Rousselet, Guillaume A., John J. Foxe, and J. Paul Bolam. 2016. ‘A Few Simple Steps to Improve the Description of Group Results in Neuroscience’. European Journal of Neuroscience 44 (9): 2647–51. [pdf](https://doi.org/10.1111/ejn.13400) [reproducibility package](https://figshare.com/articles/A_few_simple_steps_to_improve_the_description_of_group_results_in_neuroscience/3806487) .
 
-Rousselet, Guillaume A., Cyril R. Pernet, and Rand R. Wilcox. 2017. ‘Beyond Differences in Means: Robust Graphical Methods to Compare Two Groups in Neuroscience’. [pdf]() [preprint](https://doi.org/10.1101/121079) [reproducibility package]().
+Rousselet, Guillaume A., Cyril R. Pernet, and Rand R. Wilcox. 2017. ‘Beyond Differences in Means: Robust Graphical Methods to Compare Two Groups in Neuroscience’. [pdf](https://www.ncbi.nlm.nih.gov/pubmed/28544058) [preprint](https://doi.org/10.1101/121079) [reproducibility package](https://figshare.com/articles/Modern_graphical_methods_to_compare_two_groups_of_observations/4055970).
 
 The main topics include:
 
@@ -18,7 +18,9 @@ The main topics include:
 - simulations to assess power and measurement precision;
 - how to go beyond p < 0.05 and make the most of your data.
 
-The slides in pdf format are [here]().
+The slides in pdf format are available on [figshare](https://figshare.com/articles/Introduction_to_robust_statistics_-_Bordeaux_2019/7893104).
+
+Install code and data by downloading this [folder](mat.zip)
 
 ## Part 1: Introduction 
 [code](bordeaux1.Rmd)
