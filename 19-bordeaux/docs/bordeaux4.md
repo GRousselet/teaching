@@ -1,47 +1,80 @@
----
-title: "Bordeaux 2019 - robust stats - part 4: percentile bootstrap"
-author: "Guillaume A. Rousselet"
-date: "`r Sys.Date()`"
-output:
-  github_document:
-    html_preview: yes
-    toc: yes
-    toc_depth: 2
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
----
+Bordeaux 2019 - robust stats - part 4: percentile bootstrap
+================
+Guillaume A. Rousselet
+2019-03-26
 
-```{r message=FALSE, warning=FALSE}
+-   [Bootstrap implementation](#bootstrap-implementation)
+    -   [Sampling with replacement](#sampling-with-replacement)
+    -   [Loop](#loop)
+    -   [Matrix](#matrix)
+    -   [Functions](#functions)
+-   [Bootstrap sampling distribution](#bootstrap-sampling-distribution)
+    -   [Example 1: sample from normal distribution](#example-1-sample-from-normal-distribution)
+    -   [Example 2: sample from gamma distribution](#example-2-sample-from-gamma-distribution)
+-   [Bootstrap confidence interval](#bootstrap-confidence-interval)
+    -   [Graphical representation](#graphical-representation)
+    -   [Check standard confidence interval](#check-standard-confidence-interval)
+-   [Bootstrap group comparison](#bootstrap-group-comparison)
+
+``` r
 # dependencies
 library(ggplot2)
 library(tibble)
 source('./code/Rallfun-v35.txt')
 ```
 
-```{r}
+``` r
 sessionInfo()
 ```
 
-# Bootstrap implementation
+    ## R version 3.5.2 (2018-12-20)
+    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+    ## Running under: macOS Mojave 10.14.3
+    ## 
+    ## Matrix products: default
+    ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+    ## 
+    ## locale:
+    ## [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+    ## 
+    ## attached base packages:
+    ## [1] stats     graphics  grDevices utils     datasets  methods   base     
+    ## 
+    ## other attached packages:
+    ## [1] tibble_2.0.1  ggplot2_3.1.0
+    ## 
+    ## loaded via a namespace (and not attached):
+    ##  [1] Rcpp_1.0.0       knitr_1.21       magrittr_1.5     tidyselect_0.2.5
+    ##  [5] munsell_0.5.0    colorspace_1.4-0 R6_2.4.0         rlang_0.3.1     
+    ##  [9] stringr_1.4.0    plyr_1.8.4       dplyr_0.8.0.1    tools_3.5.2     
+    ## [13] grid_3.5.2       gtable_0.2.0     xfun_0.4         withr_2.1.2     
+    ## [17] htmltools_0.3.6  assertthat_0.2.0 yaml_2.2.0       lazyeval_0.2.1  
+    ## [21] digest_0.6.18    crayon_1.3.4     purrr_0.3.0      glue_1.3.0      
+    ## [25] evaluate_0.12    rmarkdown_1.11   stringi_1.3.1    compiler_3.5.2  
+    ## [29] pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
 
-## Sampling with replacement
+Bootstrap implementation
+========================
 
-Test the `sample()` function.
-Let say our sample is a sequence of integers.
-We sample with replacement from that sequence of numbers.
-Execute chunk several times to see what happens.
-```{r}
+Sampling with replacement
+-------------------------
+
+Test the `sample()` function. Let say our sample is a sequence of integers. We sample with replacement from that sequence of numbers. Execute chunk several times to see what happens.
+
+``` r
 n <- 10 # sample size
 samp <- 1:n
 boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
 boot.samp
 ```
 
-## Loop
-```{r}
+    ##  [1]  1  8  1  9  2  8  2  5  9 10
+
+Loop
+----
+
+``` r
 set.seed(21) # reproducible results
 n <- 20 # sample size
 samp <- rnorm(n) # get normal sample
@@ -60,12 +93,25 @@ samp.m <- mean(samp)
 samp.tm <- mean(samp, trim = 0.2)
 samp.md <- median(samp)
 samp.m
+```
+
+    ## [1] 0.1363416
+
+``` r
 samp.tm
+```
+
+    ## [1] 0.1835497
+
+``` r
 samp.md
 ```
 
+    ## [1] 0.3028401
+
 ### Plot original results
-```{r, fig.width=2}
+
+``` r
 set.seed(1)
 df <- tibble(cond = factor(rep(1,n)),
              res = samp) 
@@ -81,8 +127,11 @@ ggplot(df, aes(x = cond, y = res)) + theme_linedraw() +
   annotate("text", x = 1.2, y = samp.md, label = "Median", size = 3, colour = "orange")
 ```
 
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
 ### Plot bootstrap results
-```{r}
+
+``` r
 df <- tibble(res = c(boot.m, boot.tm, boot.md),
              est = factor(c(rep("Mean",nboot), rep("Trimmed mean",nboot), rep("Median",nboot)))
              )
@@ -91,8 +140,12 @@ ggplot(df, aes(x = res, colour = est)) +
   ggtitle("Boostrap samples")
 ```
 
-## Matrix
-```{r}
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+Matrix
+------
+
+``` r
 set.seed(21) # reproducible results
 n <- 20 # sample size
 samp <- rnorm(n) # get normal sample
@@ -103,14 +156,31 @@ boot.m <- apply(boot.samp, 1, mean)
 boot.md <- apply(boot.samp, 1, median)
 ```
 
-## Functions
+Functions
+---------
 
 Check out for instance the [*boot* package](https://www.statmethods.net/advstats/bootstrapping.html) and the [*resample* package](https://cran.r-project.org/web/packages/resample/index.html)
 
 Functions from Rand Wilcox
-```{r}
+
+``` r
 # source('./code/Rallfun-v35.txt')
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
+```
+
+    ## $ci
+    ## [1] -0.2710974  0.5186691
+    ## 
+    ## $n
+    ## [1] 20
+    ## 
+    ## $estimate
+    ## [1] 0.1363416
+    ## 
+    ## $p.value
+    ## [1] 0.6
+
+``` r
 # est  = estimator, could be var, mad, to use a trimmed mean, add argument trim = 0.2
 # onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0, trim = 0.1)
 # nv = null value for NHST
@@ -124,12 +194,15 @@ onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
 # hdpb()
 ```
 
-# Bootstrap sampling distribution
+Bootstrap sampling distribution
+===============================
 
-## Example 1: sample from normal distribution
+Example 1: sample from normal distribution
+------------------------------------------
 
 ### Sampling distribution
-```{r}
+
+``` r
 set.seed(777)
 n <- 100 # sample size
 nsamp <- 10000 # number of samples (experiments)
@@ -147,18 +220,21 @@ ggplot(v, aes(x = value)) +
         legend.text = element_text(size = 12),
       legend.title = element_text(size = 14)
        )
+```
+
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+``` r
 # ggsave(filename = './norm_samp_dist.pdf')
 ```
 
 ### Sampling distribution + bootstrap distribution
 
-The bootstrap distribution can approximate the sampling distribution very well for n = 100 and nboot = 1000. Comment out set.seed, so that different random numbers are generated each time you run the chunk.
-What happens for different random samples?
+The bootstrap distribution can approximate the sampling distribution very well for n = 100 and nboot = 1000. Comment out set.seed, so that different random numbers are generated each time you run the chunk. What happens for different random samples?
 
-What happens for lower values of n and nboot? 
-What do you conclude?
+What happens for lower values of n and nboot? What do you conclude?
 
-```{r}
+``` r
 set.seed(777)
 n <- 100 # sample size 
 samp <- rnorm(n) # create sample from normal population
@@ -185,24 +261,38 @@ ggplot(v, aes(x = value)) +
         legend.text = element_text(size = 12),
       legend.title = element_text(size = 14)
        )
+```
+
+    ## Warning: Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `enframe(name = NULL)` instead.
+    ## This warning is displayed once per session.
+
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-10-1.png)
+
+``` r
 # ggsave(filename = './norm_samp_dist_boot.pdf')
 ```
 
-## Example 2: sample from gamma distribution
+Example 2: sample from gamma distribution
+-----------------------------------------
 
 Check shape of gamme distribution
-```{r}
+
+``` r
 x <- seq(0, 15, .05)
 ggplot(as_tibble(x), aes(value)) +
   theme_linedraw() +
   stat_function(fun = dgamma, args = list(shape = 2, scale = 2), size = 1) +
   theme(axis.title = element_text(size = 16),
         axis.text = element_text(size = 14))
+```
+
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+``` r
 # ggsave(filename = './gamma_dist.pdf')
 ```
 
-
-```{r}
+``` r
 set.seed(777) 
 n <- 100
 gamma_shape <- 2
@@ -232,12 +322,18 @@ ggplot(v, aes(x = value)) +
         legend.text = element_text(size = 12),
       legend.title = element_text(size = 14)
        )
+```
+
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-12-1.png)
+
+``` r
 # ggsave(filename = './gamma_samp_dist_boot.pdf')
 ```
 
-# Bootstrap confidence interval
+Bootstrap confidence interval
+=============================
 
-```{r}
+``` r
 nboot <- 1000
 alpha <- .1
 lo <- nboot*(alpha/2)
@@ -258,8 +354,10 @@ ci[1] <- sort.boot.samp[lo]
 ci[2] <- sort.boot.samp[hi]
 ```
 
-## Graphical representation
-```{r}
+Graphical representation
+------------------------
+
+``` r
 ggplot(enframe(boot.samp, name = NULL), aes(x = value)) +
         theme_linedraw() +
         geom_line(aes(y = ..density..), stat = 'density', size = 1, colour = "orange1") +
@@ -277,27 +375,47 @@ ggplot(enframe(boot.samp, name = NULL), aes(x = value)) +
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 14)
        )
-# ggsave(filename = './pb_ci.pdf')
 ```
 
+![](bordeaux4_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
-## Check standard confidence interval
+``` r
+ggsave(filename = './pb_ci.pdf')
+```
+
+    ## Saving 7 x 5 in image
+
+Check standard confidence interval
+----------------------------------
+
 How do they compare?
-```{r}
+
+``` r
 t.test(samp, conf.level = 1-alpha)
 ```
 
-# Bootstrap group comparison
+    ## 
+    ##  One Sample t-test
+    ## 
+    ## data:  samp
+    ## t = 25.914, df = 99, p-value < 2.2e-16
+    ## alternative hypothesis: true mean is not equal to 0
+    ## 90 percent confidence interval:
+    ##  46.63116 53.01574
+    ## sample estimates:
+    ## mean of x 
+    ##  49.82345
+
+Bootstrap group comparison
+==========================
 
 Exercise: compute bootstrap confidence interval for the difference between two groups of the dice data.
 
 You could do it by hand by re-using the chunk of code from the start.
-```{r}
-
-```
 
 Or use Wilcox's functions for independent groups
-```{r, eval = FALSE}
+
+``` r
 # to compare any estimators
 pb2gen(x, y, alpha=0.05, nboot=1000, est=median, SEED=FALSE)
 # same as pb2gen but only to compare medians:
@@ -310,15 +428,11 @@ comvar2()
 ```
 
 Dependent groups
-```{r, eval = FALSE}
+
+``` r
 # percentile bootstrap using any estimator
 # default to difference scores - dif=TRUE
 bootdpci(x,y,est=median)
 # to compare two variances
 comdvar(x,y,alpha=0.05)
 ```
-
-
-
-
-

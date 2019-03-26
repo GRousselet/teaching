@@ -35,7 +35,7 @@ For inferences on multiple quantiles, see these guides about the [shift function
 # Quantiles
 ```{r}
 # check help, many techniques available
-xf<-rnorm(100)
+xf <- rnorm(100)
 quantile(xf)
 # Harrel-Davis estimator of the quantiles
 hd(xf,q=.5) # Harrel-Davis estimate of the median
@@ -45,25 +45,31 @@ idealf(xf) # better 1st and 3rd quartiles?
 
 # Discarding outliers 
 
-Crazy example
+Obvious example?
 ```{r}
 x <- c(2,2,3,3,3,4,4,4,100000,100000)
 ```
 
 ## Boxplot rule
+```{r}
 outbox(x)
 res<-outbox(x)
 xclean<-x[res$keep]
+```
 
-# 2 SD away from the mean rule
+## 2 SD away from the mean rule
+```{r}
 k<-2
 res<-(abs(x-mean(x))/sd(x))>k
 x[res]
+```
 
-# MAD median rule
+## MAD median rule
+```{r}
 k<-2.24
 (abs(x-median(x))/(mad(x)))>k
-#out(x)
+#out(x) # Rand Wilcox's function
+```
 
 # Measures of central tendency 
 
@@ -106,36 +112,34 @@ polygon(c(xv[xv>=zval],zval),c(yv[xv>=zval],yv[xv==4]),col=5)
 ```
 
 
-## example: get trimmed means of all columns of 
+## example: get trimmed means of all columns of a matrix
 ```{r}
 set.seed(21)
 v <- matrix(rnorm(50), nrow = 10) # reshape into 10 x 5 matrix
-apply(v, 2, mean, tr=.2) # compute trimmed mean for each column
+apply(v, 2, mean, trim=.2) # compute trimmed mean for each column
 ```
 
-
-# Winzorised mean
+## Winzorised mean
 ```{r, eval = FALSE}
 winmean(x,tr=.2)
 ```
 
-# Winzorised variance
+### Winzorised variance
 ```{r, eval = FALSE}
 winvar(x,tr=.2)
 ```
 
-# Standard error of the trimmed mean
+### Standard error of the trimmed mean
 ```{r, eval = FALSE}
 trimse(x,tr=.2)
 ```
 
-# compare techniques
+## Compare techniques
 ```{r}
-self<-t(read.table("./data/self-awareness.csv",header=F))
+self<-t(read.table("./data/self-awareness.csv",header=FALSE))
 stripchart(self, method="jitter", pch=1)
-cbind(mean=round(mean(self),digits=1),median=median(self),tm=round(tmean(self,tr=.2),digits=1))
+cbind(mean=round(mean(self),digits=1),median=median(self),tm=round(mean(self,trim=.2),digits=1))
 ```
-
 
 # Tests and confidence intervals for groups
 
@@ -144,23 +148,26 @@ cbind(mean=round(mean(self),digits=1),median=median(self),tm=round(tmean(self,tr
 ### Kolmogorov-Smirnov test
 
 See explanation in this [blog post](https://garstats.wordpress.com/2016/05/02/robust-effect-sizes-for-2-independent-groups/).
+```{r, eval = FALSE}
+ks.test(x, y)
+```
 
-## T-tests on means and trimmed means
-```{r}
+### T-tests on means and trimmed means
+```{r, eval=FALSE}
 yuen(x,y,tr=0.2,alpha=0.05)
 # set tr=0 for a t-test on means
 # compare output to t.test
 ```
 
 ### Compare medians
-```{r}
+```{r, eval=FALSE}
 msmed(x,y,alpha=0.05)
 ```
 
 ## Dependent groups
 
 ### T-tests on trimmed means
-```{r}
+```{r, eval=FALSE}
 yuend(x,y,tr=0.2,alpha=0.05)
 ```
 
