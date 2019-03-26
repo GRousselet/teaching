@@ -8,7 +8,7 @@ Rousselet, Guillaume A., John J. Foxe, and J. Paul Bolam. 2016. ‘A Few Simple 
 [[pdf](https://doi.org/10.1111/ejn.13400)] 
 [[reproducibility package](https://figshare.com/articles/A_few_simple_steps_to_improve_the_description_of_group_results_in_neuroscience/3806487)].
 
-Rousselet, Guillaume A., Cyril R. Pernet, and Rand R. Wilcox. 2017. ‘Beyond Differences in Means: Robust Graphical Methods to Compare Two Groups in Neuroscience’. [
+Rousselet, Guillaume A., Cyril R. Pernet, and Rand R. Wilcox. 2017. ‘Beyond Differences in Means: Robust Graphical Methods to Compare Two Groups in Neuroscience’.
 [[pdf](https://www.ncbi.nlm.nih.gov/pubmed/28544058)] 
 [[preprint](https://doi.org/10.1101/121079)] 
 [[reproducibility package](https://figshare.com/articles/Modern_graphical_methods_to_compare_two_groups_of_observations/4055970)]
