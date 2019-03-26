@@ -22,25 +22,32 @@ The slides in pdf format are [here]().
 
 ## Part 1: Introduction 
 [code](bordeaux1.Rmd)
+
 [html notebook](docs/bordeaux1.md)
 
 ## Part 2: 
 [code](bordeaux2.Rmd)
+
 [html notebook](docs/bordeaux2.md)
 
 ## Part 3: 
 [code](bordeaux3.Rmd)
+
 [html notebook](docs/bordeaux3.md)
 
 ## Part 4: 
 [code](bordeaux4.Rmd)
+
 [html notebook](docs/bordeaux4.md)
+
 [extra notebook](docs/bordeaux4_extra.md)
 
 ## Part 5: 
 [code](bordeaux5.Rmd)
+
 [html notebook](docs/bordeaux5.md)
 
 ## Part 6: 
 [code](bordeaux6.Rmd)
+
 [html notebook](docs/bordeaux6.md)
