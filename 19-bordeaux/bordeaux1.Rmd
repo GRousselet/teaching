@@ -51,22 +51,24 @@ Enter the data in R or a text file: 5 rows (trials) and 10 columns (participants
 ```{r}
 # enter data in matrix with 5 rows, 10 columns:
 
-# dice_res[,1] <- c(,,,,)
-# dice_res[,2] <- c(,,,,)
-# dice_res[,3] <- c(,,,,)
-# dice_res[,4] <- c(,,,,)
-# dice_res[,5] <- c(,,,,)
-# dice_res[,6] <- c(,,,,)
-# dice_res[,7] <- c(,,,,)
-# dice_res[,8] <- c(,,,,)
-# dice_res[,9] <- c(,,,,)
-# dice_res[,10] <- c(,,,,)
+dice_res <- matrix(NA, nrow = 5, ncol = 10)
+
+dice_res[,1] <- c(,,,,)
+dice_res[,2] <- c(,,,,)
+dice_res[,3] <- c(,,,,)
+dice_res[,4] <- c(,,,,)
+dice_res[,5] <- c(,,,,)
+dice_res[,6] <- c(,,,,)
+dice_res[,7] <- c(,,,,)
+dice_res[,8] <- c(,,,,)
+dice_res[,9] <- c(,,,,)
+dice_res[,10] <- c(,,,,)
 
 # Save in a txt file:
 
-# write.table(dice_res, file = "./data/dice_res_blue.txt", row.names=FALSE, col.names=FALSE)
-# write.table(dice_res, file = "./data/dice_res_green.txt", row.names=FALSE, col.names=FALSE)
-# write.table(dice_res, file = "./data/dice_res_red.txt", row.names=FALSE, col.names=FALSE)
+write.table(dice_res, file = "./data/dice_res_blue.txt", row.names=FALSE, col.names=FALSE)
+write.table(dice_res, file = "./data/dice_res_green.txt", row.names=FALSE, col.names=FALSE)
+write.table(dice_res, file = "./data/dice_res_red.txt", row.names=FALSE, col.names=FALSE)
 
 # email me the data: Guillaume.Rousselet@glasgow.ac.uk
 ```
@@ -118,10 +120,14 @@ df$gp <- factor(df$gp, levels=unique(df$gp))
   labs(x = "Groups", y = "Observations") +   
     coord_cartesian(ylim = c(0, 12)) +
     scale_y_continuous(breaks = seq(0, 12, 2)) +
-  geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
-                fun.ymax = mean, colour = "grey", width = .55, size = 3) +
-  geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
-                fun.ymax = mean, colour = "black", width = .5, size = 1)
+  # geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
+  #               fun.ymax = mean, colour = "grey", width = .55, size = 3) +
+  # geom_errorbar(stat = "summary", fun.y = mean, fun.ymin = mean,
+  #               fun.ymax = mean, colour = "black", width = .5, size = 1)
+      geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median,
+                fun.ymax = median, colour = "grey", width = .55, size = 3) +
+  geom_errorbar(stat = "summary", fun.y = median, fun.ymin = median,
+                fun.ymax = median, colour = "black", width = .5, size = 1)
 ```
 
 ## Inferential statistics?

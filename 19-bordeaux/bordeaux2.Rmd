@@ -154,6 +154,8 @@ ks.test(x, y)
 
 ### T-tests on means and trimmed means
 ```{r, eval=FALSE}
+x <- m.red
+y <- m.blue
 yuen(x,y,tr=0.2,alpha=0.05)
 # set tr=0 for a t-test on means
 # compare output to t.test

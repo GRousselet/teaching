@@ -141,7 +141,7 @@ Generate data
 set.seed(21)
 n <- 50 # sample size
 mu <- c(0, 0) # means of the variables
-rho <- 0 # correlation between variables
+rho <- 0.5 # correlation between variables
 sigma <- matrix(c(1, rho, rho, 1), nrow = 2, byrow = TRUE) # covariance matrix
 
 # group 1

@@ -65,7 +65,8 @@ samp.md
 ```
 
 ### Plot original results
-```{r, fig.width=2}
+```{r}
+# , fig.width=2
 set.seed(1)
 df <- tibble(cond = factor(rep(1,n)),
              res = samp) 
@@ -110,6 +111,7 @@ Check out for instance the [*boot* package](https://www.statmethods.net/advstats
 Functions from Rand Wilcox
 ```{r}
 # source('./code/Rallfun-v35.txt')
+set.seed(1)
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
 # est  = estimator, could be var, mad, to use a trimmed mean, add argument trim = 0.2
 # onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0, trim = 0.1)
